@@ -194,7 +194,7 @@
       <div>
         <h1 id="whoName">&hellip;</h1>
         <div class="roles" id="whoRoles"></div>
-        <span class="id-badge" id="whoBadge" hidden>✓ Verified wizard</span>
+        <span class="id-badge" id="whoBadge" style="display:none">✓ Verified wizard</span>
       </div>
     </header>
 
@@ -317,7 +317,7 @@ function fillGrid(grid, panels, emptyText) {
       whoPhoto.appendChild(img);
     }
   }
-  whoBadge.hidden = !verified.includes(NAME);
+  whoBadge.style.display = verified.includes(NAME) ? "inline-block" : "none";
 
   fillGrid(mineGrid, panels.filter(p => p.creator === NAME),
     "Nothing here yet — the producers will drop " + NAME.split(/\s+/)[0] + "'s stuff here soon.");

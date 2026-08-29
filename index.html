@@ -384,8 +384,8 @@ if (!FEED.length) {
   note.style.cssText = "flex:1;text-align:center;padding:46px 24px;font-size:14px;color:var(--muted);background:var(--panel);border:1px dashed var(--border);border-radius:6px;";
   note.textContent = "Fresh work is on the way — the feed fills up soon.";
   track.appendChild(note);
-  document.querySelector(".feed-controls").hidden = true;
-  dots.hidden = true;
+  document.querySelector(".feed-controls").style.display = "none";
+  dots.style.display = "none";
 }
 
 FEED.forEach((post, i) => {
