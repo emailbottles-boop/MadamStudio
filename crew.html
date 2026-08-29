@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wizard ID — Madam Studio</title>
+<meta name="description" content="Crew verification for Madam Studio. Worked on Wizard Shit? Claim your credit identity card and the producers will verify you.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  /* Flat light-blue theme — matches index.html, no gradients. */
+  :root {
+    --bg:      #d9e9f4;
+    --panel:   #ffffff;
+    --panel-2: #eef6fb;
+    --border:  #b3cfe1;
+    --text:    #16303f;
+    --text-2:  #3d5b6e;
+    --muted:   #5b7c92;
+    --accent:  #2176b5;
+    --accent-deep: #175a8c;
+    --verified: #1e8e5a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+
+  .corner-nav {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+  }
+
+  .studio-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 3px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .studio-btn:hover { border-color: var(--accent); background: var(--panel-2); }
+  .studio-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .head {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 110px 24px 34px;
+    text-align: center;
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: clamp(30px, 6vw, 46px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--accent-deep);
+    margin-bottom: 12px;
+  }
+  .head p {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.65;
+  }
+
+  .grid {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 24px 90px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .id-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+    font-family: inherit;
+    color: inherit;
+  }
+  .id-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .id-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .id-photo {
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .id-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .id-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .id-roles {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+    white-space: pre-line;
+  }
+  .id-badge {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--verified);
+    border: 1px solid var(--verified);
+    border-radius: 3px;
+    padding: 3px 8px;
+  }
+
+  .grid-note {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    padding: 30px 0;
+  }
+
+  /* ── claim modal ─────────────────────────────────── */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 24, 34, 0.6);
+    padding: 20px;
+  }
+  .overlay.open { display: flex; }
+
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 26px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+  }
+  .modal .id-photo { width: 72px; height: 72px; }
+  .modal h2 { font-size: 19px; margin-bottom: 6px; }
+  .modal .sub { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 18px; }
+
+  .modal input[type=email] {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 11px 12px;
+    margin-bottom: 12px;
+  }
+  .modal input[type=email]:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .btn-row { display: flex; gap: 10px; justify-content: center; }
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    padding: 11px 18px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .btn:hover { border-color: var(--accent); background: var(--panel-2); }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn.primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+  .btn:disabled { opacity: 0.6; cursor: wait; }
+
+  .modal-msg { font-size: 13px; margin-top: 14px; line-height: 1.5; display: none; }
+  .modal-msg.err { color: #b3323c; display: block; }
+  .modal-msg.ok { color: var(--verified); display: block; }
+
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+  footer {
+    text-align: center;
+    padding: 26px 20px 34px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  footer a { color: var(--text-2); }
+
+  @media (max-width: 480px) {
+    .corner-nav { top: 16px; right: 16px; }
+    .studio-btn { font-size: 11px; padding: 9px 13px; }
+    .head { padding-top: 96px; }
+  }
+</style>
+</head>
+<body>
+
+  <nav class="corner-nav">
+    <a class="studio-btn" href="index.html">Madam Studio</a>
+  </nav>
+
+  <header class="head">
+    <p class="eyebrow">Crew verification</p>
+    <h1>Wizard ID</h1>
+    <p>Worked on the show? Find your credit identity card below, click it, and drop the gmail you want on file. The producers check every claim by hand before it counts.</p>
+  </header>
+
+  <main class="grid" id="grid" aria-label="Crew credit cards">
+    <div class="grid-note" id="gridNote">Summoning the crew&hellip;</div>
+  </main>
+
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <form class="modal" id="claimForm" novalidate>
+      <div class="id-photo" id="modalPhoto"></div>
+      <h2 id="modalName"></h2>
+      <p class="sub">If this is your card, enter your gmail. The producers will verify it&rsquo;s really you before anything happens.</p>
+      <input type="email" id="claimEmail" placeholder="you@gmail.com" autocomplete="email">
+      <input type="text" class="hp" name="website" id="claimHp" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="btn-row">
+        <button type="button" class="btn" id="claimCancel">Cancel</button>
+        <button type="submit" class="btn primary" id="claimSubmit">Claim this card</button>
+      </div>
+      <p class="modal-msg" id="modalMsg"></p>
+    </form>
+  </div>
+
+  <footer>
+    &copy; Madam Studio &mdash; All Rights Reserved &middot; NFP (Not For Profit)
+  </footer>
+
+<script>
+/* The crew cards come from the same API that powers wizardshit.store's
+   credits, so this page never needs editing when the crew changes. If the
+   API is unreachable, a baked-in name list keeps the page alive. */
+const API = "https://wizardshit.store";
+
+const FALLBACK_CREW = [
+  "Sheamus Aaren", "Emman Paraiso", "Pau Medrano", "Ann Nicole",
+  "Mohanad Ahmed", "Sapphic Shroom", "Rowan Ashmore", "Charbuz",
+];
+
+const grid = document.getElementById("grid");
+const gridNote = document.getElementById("gridNote");
+const overlay = document.getElementById("overlay");
+const modalPhoto = document.getElementById("modalPhoto");
+const modalName = document.getElementById("modalName");
+const claimForm = document.getElementById("claimForm");
+const claimEmail = document.getElementById("claimEmail");
+const claimSubmit = document.getElementById("claimSubmit");
+const modalMsg = document.getElementById("modalMsg");
+
+let selected = null;
+
+function initials(name) {
+  return name.split(/\s+/).map(w => w[0] || "").join("").slice(0, 2).toUpperCase();
+}
+
+function photoEl(person) {
+  const box = document.createElement("div");
+  box.className = "id-photo";
+  if (person.photo) {
+    const img = document.createElement("img");
+    img.loading = "lazy";
+    img.alt = "";
+    img.src = /^https?:\/\//i.test(person.photo) ? person.photo : API + "/" + person.photo.replace(/^\/+/, "");
+    img.onerror = () => { img.remove(); box.textContent = initials(person.name); };
+    box.appendChild(img);
+  } else {
+    box.textContent = initials(person.name);
+  }
+  return box;
+}
+
+function renderCrew(people, verified) {
+  grid.innerHTML = "";
+  people.forEach(person => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "id-card";
+    card.appendChild(photoEl(person));
+    const nm = document.createElement("div");
+    nm.className = "id-name";
+    nm.textContent = person.name;
+    card.appendChild(nm);
+    if (person.roles) {
+      const rl = document.createElement("div");
+      rl.className = "id-roles";
+      rl.textContent = person.roles;
+      card.appendChild(rl);
+    }
+    if (verified.includes(person.name)) {
+      const b = document.createElement("span");
+      b.className = "id-badge";
+      b.textContent = "✓ Verified wizard";
+      card.appendChild(b);
+    }
+    card.addEventListener("click", () => openModal(person));
+    grid.appendChild(card);
+  });
+}
+
+function openModal(person) {
+  selected = person;
+  modalName.textContent = person.name;
+  modalPhoto.replaceWith(Object.assign(photoEl(person), { id: "modalPhoto" }));
+  claimEmail.value = "";
+  modalMsg.className = "modal-msg";
+  claimSubmit.disabled = false;
+  overlay.classList.add("open");
+  claimEmail.focus();
+}
+function closeModal() { overlay.classList.remove("open"); selected = null; }
+
+document.getElementById("claimCancel").addEventListener("click", closeModal);
+overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+claimForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!selected) return;
+  if (!claimEmail.validity.valid || !claimEmail.value.trim()) {
+    modalMsg.textContent = "That doesn't look like an email — check it and try again.";
+    modalMsg.className = "modal-msg err";
+    return;
+  }
+  claimSubmit.disabled = true;
+  modalMsg.className = "modal-msg";
+  let result = null;
+  try {
+    const res = await fetch(API + "/api/claim", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: selected.name,
+        email: claimEmail.value.trim(),
+        website: document.getElementById("claimHp").value,
+      }),
+    });
+    result = { ok: res.ok, data: await res.json().catch(() => ({})) };
+  } catch (_) { /* network / not deployed yet */ }
+
+  if (result && result.ok) {
+    modalMsg.textContent = "Claim sent ✨ The producers will verify you soon.";
+    modalMsg.className = "modal-msg ok";
+    setTimeout(closeModal, 2600);
+  } else {
+    claimSubmit.disabled = false;
+    modalMsg.textContent = (result && result.data && result.data.error)
+      ? result.data.error
+      : "Verification isn't open yet — try again soon.";
+    modalMsg.className = "modal-msg err";
+  }
+});
+
+/* load the crew + verified badges */
+(async () => {
+  let people = null;
+  let verified = [];
+  try {
+    const res = await fetch(API + "/api/content");
+    if (res.ok) {
+      const data = await res.json();
+      people = (data.credits || []).map(c => ({ name: c.name, roles: c.roles || "", photo: c.photo || "" }));
+    }
+  } catch (_) {}
+  try {
+    const res = await fetch(API + "/api/claims-public");
+    if (res.ok) verified = (await res.json()).verified || [];
+  } catch (_) {}
+  if (!people || !people.length) {
+    people = FALLBACK_CREW.map(name => ({ name, roles: "", photo: "" }));
+  }
+  renderCrew(people, verified);
+})();
+</script>
+
+</body>
+</html>
