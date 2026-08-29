@@ -316,6 +316,7 @@
 <body>
 
   <nav class="corner-nav">
+    <a class="studio-btn" href="apply.html">Apply</a>
     <a class="studio-btn" href="crew.html">Wizard ID</a>
     <a class="studio-btn" href="https://wizardshit.store" target="_blank" rel="noopener">Wizard Shit</a>
   </nav>
@@ -324,14 +325,13 @@
     <section class="hero">
       <p class="eyebrow">Independent animation studio</p>
       <h1>Madam Studio</h1>
-      <p class="hero-sub">Hand-drawn cartoons made with love by artists around the world. Home of the animated series Wizard Shit.</p>
-      <a class="scroll-hint" href="#feed">&darr; Studio feed</a>
+      <p class="hero-sub">Hand-drawn cartoons by artists around the world. Home of Wizard Shit.</p>
+      <a class="scroll-hint" href="#feed">&darr; Feed</a>
     </section>
 
     <section class="feed-section" id="feed" aria-label="Latest work from the studio">
       <div class="section-head">
-        <span class="tag">Fresh from the desk</span>
-        <h2>Studio feed</h2>
+        <h2>Feed</h2>
         <div class="feed-controls">
           <button class="feed-arrow" id="feedPrev" aria-label="Previous post">&larr;</button>
           <button class="feed-arrow" id="feedNext" aria-label="Next post">&rarr;</button>
@@ -342,8 +342,8 @@
     </section>
 
     <section class="about">
-      <h2>What we make</h2>
-      <p>Madam Studio is the production home of <strong>Wizard Shit</strong>, a hand-animated indie cartoon set in Wizard City &mdash; plus the sketches, paintings, boards, and merch that orbit it. Everything in the feed above is work from our artists.</p>
+      <h2>About</h2>
+      <p>Madam Studio makes <strong>Wizard Shit</strong> &mdash; a hand-animated indie cartoon &mdash; and everything around it.</p>
       <a class="studio-btn" href="https://wizardshit.store" target="_blank" rel="noopener">Watch the show</a>
     </section>
   </main>
@@ -353,7 +353,7 @@
   </div>
 
   <footer>
-    &copy; Madam Studio &mdash; All Rights Reserved &middot; NFP (Not For Profit)
+    &copy; Madam Studio &middot; NFP
   </footer>
 
 <script>
@@ -382,7 +382,7 @@ const lightboxImg = document.getElementById("lightboxImg");
 if (!FEED.length) {
   const note = document.createElement("div");
   note.style.cssText = "flex:1;text-align:center;padding:46px 24px;font-size:14px;color:var(--muted);background:var(--panel);border:1px dashed var(--border);border-radius:6px;";
-  note.textContent = "Fresh work is on the way — the feed fills up soon.";
+  note.textContent = "Coming soon.";
   track.appendChild(note);
   document.querySelector(".feed-controls").style.display = "none";
   dots.style.display = "none";

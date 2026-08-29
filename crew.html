@@ -258,18 +258,18 @@
   <header class="head">
     <p class="eyebrow">Crew verification</p>
     <h1>Wizard ID</h1>
-    <p>Worked on the show? Find your credit identity card below, click it, and drop the gmail you want on file. The producers check every claim by hand before it counts.</p>
+    <p>Click your card and add your gmail. The producers verify every claim.</p>
   </header>
 
   <main class="grid" id="grid" aria-label="Crew credit cards">
-    <div class="grid-note" id="gridNote">Summoning the crew&hellip;</div>
+    <div class="grid-note" id="gridNote">Loading&hellip;</div>
   </main>
 
   <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modalName">
     <form class="modal" id="claimForm" novalidate>
       <div class="id-photo" id="modalPhoto"></div>
       <h2 id="modalName"></h2>
-      <p class="sub">If this is your card, enter your gmail. The producers will verify it&rsquo;s really you before anything happens.</p>
+      <p class="sub">If this is your card, enter your gmail. The producers will verify it.</p>
       <input type="email" id="claimEmail" placeholder="you@gmail.com" autocomplete="email">
       <input type="text" class="hp" name="website" id="claimHp" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="btn-row">
@@ -277,12 +277,12 @@
         <button type="submit" class="btn primary" id="claimSubmit">Claim this card</button>
       </div>
       <p class="modal-msg" id="modalMsg"></p>
-      <p class="page-link"><a id="modalPageLink" href="crew.html">Or just visit their page &rarr;</a></p>
+      <p class="page-link"><a id="modalPageLink" href="crew.html">Visit their page &rarr;</a></p>
     </form>
   </div>
 
   <footer>
-    &copy; Madam Studio &mdash; All Rights Reserved &middot; NFP (Not For Profit)
+    &copy; Madam Studio &middot; NFP
   </footer>
 
 <script>
@@ -348,7 +348,7 @@ function renderCrew(people, verified) {
     if (verified.includes(person.name)) {
       const b = document.createElement("span");
       b.className = "id-badge";
-      b.textContent = "✓ Verified wizard";
+      b.textContent = "✓ Verified";
       card.appendChild(b);
     }
     card.addEventListener("click", () => openModal(person));
@@ -398,14 +398,14 @@ claimForm.addEventListener("submit", async e => {
   } catch (_) { /* network / not deployed yet */ }
 
   if (result && result.ok) {
-    modalMsg.textContent = "Claim sent ✨ The producers will verify you soon.";
+    modalMsg.textContent = "Claim sent ✓";
     modalMsg.className = "modal-msg ok";
     setTimeout(closeModal, 2600);
   } else {
     claimSubmit.disabled = false;
     modalMsg.textContent = (result && result.data && result.data.error)
       ? result.data.error
-      : "Verification isn't open yet — try again soon.";
+      : "Not open yet — try again soon.";
     modalMsg.className = "modal-msg err";
   }
 });
