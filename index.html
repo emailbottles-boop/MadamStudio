@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Madam Studio</title>
+<meta name="description" content="Madam Studio — the independent animation studio behind Wizard Shit. Fresh work from the studio feed: sketches, paintings, boards, and merch.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<meta property="og:title" content="Madam Studio">
+<meta property="og:description" content="The independent animation studio behind Wizard Shit.">
+<meta property="og:image" content="img/wizard-shit-logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg:      #14071f;
+    --panel:   #1e0d2d;
+    --panel-2: #261038;
+    --border:  #3a1c52;
+    --text:    #f0e8ff;
+    --text-2:  #c4aee0;
+    --muted:   #8a79a8;
+    --purple:  #9b5de5;
+    --purple-deep: #5e2b8f;
+    --gold:    #f4d35e;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 900px 600px at -10% -20%, rgba(155,93,229,0.20) 0%, transparent 60%),
+      radial-gradient(ellipse 600px 400px at 110% 5%, rgba(244,211,94,0.07) 0%, transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  main { position: relative; z-index: 1; }
+
+  /* ── corner nav button ─────────────────────────────── */
+  .corner-nav {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 10;
+  }
+
+  .studio-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 3px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  }
+  .studio-btn:hover {
+    border-color: var(--purple);
+    background: var(--panel-2);
+    transform: translateY(-1px);
+  }
+  .studio-btn:focus-visible {
+    outline: 2px solid var(--purple);
+    outline-offset: 2px;
+  }
+  .studio-btn::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* ── hero ─────────────────────────────────────────── */
+  .hero {
+    min-height: 72vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 96px 24px 48px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-size: clamp(40px, 8vw, 72px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    background: linear-gradient(105deg, #ffffff 0%, #d4b8ff 40%, var(--purple) 70%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 16px;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 480px;
+    line-height: 1.6;
+  }
+
+  .scroll-hint {
+    margin-top: 42px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .scroll-hint:hover { color: var(--gold); }
+
+  /* ── feed section ─────────────────────────────────── */
+  .feed-section { padding: 24px 0 72px; }
+
+  .section-head {
+    max-width: 1100px;
+    margin: 0 auto 22px;
+    padding: 0 24px;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .section-head h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .section-head .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .feed-controls {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+  }
+  .feed-arrow {
+    width: 38px; height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-size: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .feed-arrow:hover { border-color: var(--purple); background: var(--panel-2); }
+  .feed-arrow:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+
+  .feed-track {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 6px max(24px, calc((100vw - 1100px) / 2 + 24px)) 18px;
+    scrollbar-width: none;
+  }
+  .feed-track::-webkit-scrollbar { display: none; }
+
+  .feed-card {
+    flex: 0 0 min(520px, 86vw);
+    scroll-snap-align: center;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .feed-card:hover { border-color: var(--purple); transform: translateY(-2px); }
+
+  .feed-card figure {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--bg);
+    cursor: zoom-in;
+  }
+  .feed-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .feed-meta { padding: 16px 18px 18px; }
+  .feed-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 7px;
+  }
+  .feed-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  .feed-note {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .feed-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .feed-dots button {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: var(--border);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .feed-dots button.on { background: var(--gold); transform: scale(1.25); }
+  .feed-dots button:focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; }
+
+  /* ── about ────────────────────────────────────────── */
+  .about {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px 24px 88px;
+    text-align: center;
+  }
+  .about h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .about p {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-bottom: 26px;
+  }
+  .about .studio-btn { border-color: var(--purple-deep); }
+
+  /* ── lightbox ─────────────────────────────────────── */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 3, 18, 0.92);
+    padding: 4vh 4vw;
+    cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 26px 20px 34px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  footer a { color: var(--text-2); }
+
+  @media (max-width: 480px) {
+    .corner-nav { top: 16px; right: 16px; }
+    .studio-btn { font-size: 11px; padding: 9px 13px; }
+    .hero { min-height: 62vh; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .feed-card, .studio-btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+  <nav class="corner-nav">
+    <a class="studio-btn" href="https://wizardshit.store" target="_blank" rel="noopener">Wizard Shit</a>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Independent animation studio</p>
+      <h1>Madam Studio</h1>
+      <p class="hero-sub">Hand-drawn cartoons made with love by artists around the world. Home of the animated series Wizard Shit.</p>
+      <a class="scroll-hint" href="#feed">&darr; Studio feed</a>
+    </section>
+
+    <section class="feed-section" id="feed" aria-label="Latest work from the studio">
+      <div class="section-head">
+        <span class="tag">Fresh from the desk</span>
+        <h2>Studio feed</h2>
+        <div class="feed-controls">
+          <button class="feed-arrow" id="feedPrev" aria-label="Previous post">&larr;</button>
+          <button class="feed-arrow" id="feedNext" aria-label="Next post">&rarr;</button>
+        </div>
+      </div>
+      <div class="feed-track" id="feedTrack" tabindex="0"></div>
+      <div class="feed-dots" id="feedDots" role="tablist" aria-label="Feed position"></div>
+    </section>
+
+    <section class="about">
+      <h2>What we make</h2>
+      <p>Madam Studio is the production home of <strong>Wizard Shit</strong>, a hand-animated indie cartoon set in Wizard City &mdash; plus the sketches, paintings, boards, and merch that orbit it. Everything in the feed above is work from our artists.</p>
+      <a class="studio-btn" href="https://wizardshit.store" target="_blank" rel="noopener">Watch the show</a>
+    </section>
+  </main>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <img id="lightboxImg" src="" alt="">
+  </div>
+
+  <footer>
+    &copy; Madam Studio &mdash; All Rights Reserved &middot; NFP (Not For Profit)
+  </footer>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   THE FEED — newest first.
+
+   To add a post: drop the image into img/ and add one block like this
+   to the TOP of the list below, then commit. That's the whole job.
+
+     { img: "img/your-picture.png",
+       alt: "what's in the picture, for screen readers",
+       date: "2026-09-14",
+       title: "Short headline",
+       note: "One or two lines about the piece." },
+   ════════════════════════════════════════════════════════════════════ */
+const FEED = [
+  { img: "img/character-sketch.jpeg",
+    alt: "Work-in-progress character sketch of a smiling bearded man with a hair bun",
+    date: "2026-08-29",
+    title: "From the sketchbook",
+    note: "A work-in-progress character study fresh off an artist's desk." },
+
+  { img: "img/frog-painting.jpeg",
+    alt: "Oil painting of a green frog resting on a red velvet cushion surrounded by jewels",
+    date: "2026-08-21",
+    title: "His royal frogness",
+    note: "Oil on canvas. Every court needs a frog on a cushion." },
+
+  { img: "img/holorat-sticker.png",
+    alt: "Holographic sticker of a wizard rat with candy, captioned: it's dangerous to go alone, take these drugs",
+    date: "2026-08-12",
+    title: "Holo rat sticker",
+    note: "Holographic merch straight out of Wizard City. Available in the shop." },
+
+  { img: "img/chibi-head.png",
+    alt: "Chibi drawing of a smiling character with messy black hair and star-shaped earrings",
+    date: "2026-08-02",
+    title: "Chibi mode",
+    note: "Sometimes a character just needs a tiny round version of themselves." },
+
+  { img: "img/wizard-shit-logo.png",
+    alt: "Wizard Shit logo over a purple starry sky",
+    date: "2026-07-20",
+    title: "The show that started it all",
+    note: "Wizard Shit — hand-animated, fully independent. Watch it at wizardshit.store." },
+];
+
+/* ── render ─────────────────────────────────────────── */
+const track = document.getElementById("feedTrack");
+const dots = document.getElementById("feedDots");
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightboxImg");
+
+FEED.forEach((post, i) => {
+  const card = document.createElement("article");
+  card.className = "feed-card";
+  card.innerHTML =
+    '<figure><img loading="lazy" decoding="async"></figure>' +
+    '<div class="feed-meta">' +
+      '<div class="feed-date"></div>' +
+      '<div class="feed-title"></div>' +
+      '<div class="feed-note"></div>' +
+    '</div>';
+  const img = card.querySelector("img");
+  img.src = post.img;
+  img.alt = post.alt || post.title;
+  card.querySelector(".feed-date").textContent = post.date;
+  card.querySelector(".feed-title").textContent = post.title;
+  card.querySelector(".feed-note").textContent = post.note;
+  card.querySelector("figure").addEventListener("click", () => {
+    lightboxImg.src = post.img;
+    lightboxImg.alt = img.alt;
+    lightbox.classList.add("open");
+    lightbox.setAttribute("aria-hidden", "false");
+  });
+  track.appendChild(card);
+
+  const dot = document.createElement("button");
+  dot.setAttribute("role", "tab");
+  dot.setAttribute("aria-label", "Go to post " + (i + 1));
+  dot.addEventListener("click", () => scrollToCard(i));
+  dots.appendChild(dot);
+});
+
+function closeLightbox() {
+  lightbox.classList.remove("open");
+  lightbox.setAttribute("aria-hidden", "true");
+  lightboxImg.src = "";
+}
+lightbox.addEventListener("click", closeLightbox);
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeLightbox(); });
+
+/* ── sliding ────────────────────────────────────────── */
+const cards = [...track.children];
+const dotEls = [...dots.children];
+let current = 0;
+
+function scrollToCard(i) {
+  current = (i + cards.length) % cards.length;
+  const card = cards[current];
+  track.scrollTo({
+    left: card.offsetLeft - (track.clientWidth - card.clientWidth) / 2,
+    behavior: "smooth",
+  });
+}
+
+document.getElementById("feedPrev").addEventListener("click", () => { pause(); scrollToCard(current - 1); });
+document.getElementById("feedNext").addEventListener("click", () => { pause(); scrollToCard(current + 1); });
+
+/* keep `current` + dots in sync when the visitor swipes by hand */
+const watcher = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting) {
+      current = cards.indexOf(en.target);
+      dotEls.forEach((d, i) => d.classList.toggle("on", i === current));
+    }
+  });
+}, { root: track, threshold: 0.6 });
+cards.forEach(c => watcher.observe(c));
+
+/* auto-advance every 5s; any interaction pauses it for 12s */
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let timer = null, resumeAt = 0;
+
+function tick() {
+  if (Date.now() >= resumeAt && document.visibilityState === "visible") {
+    scrollToCard(current + 1);
+  }
+}
+function pause() { resumeAt = Date.now() + 12000; }
+
+if (!reduceMotion && cards.length > 1) {
+  timer = setInterval(tick, 5000);
+  ["pointerdown", "wheel", "touchstart", "keydown"].forEach(ev =>
+    track.addEventListener(ev, pause, { passive: true })
+  );
+  track.addEventListener("pointerenter", pause);
+}
+</script>
+
+</body>
+</html>
