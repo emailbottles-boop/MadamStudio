@@ -257,6 +257,13 @@ async function render(){
   cw.innerHTML = "";
   if (me.creators.length){
     me.creators.forEach(n => cw.appendChild(chip(n, true)));
+    if (me.paidTotal){
+      const paid = document.createElement("div");
+      paid.className = "row-line";
+      paid.style.marginTop = "10px";
+      paid.textContent = "Paid to you so far: $" + Number(me.paidTotal).toFixed(2) + " — see the breakdown on your hub.";
+      cw.appendChild(paid);
+    }
   } else {
     cw.innerHTML = '<div class="row-line">No creator access yet. Claim your card below.</div>';
   }

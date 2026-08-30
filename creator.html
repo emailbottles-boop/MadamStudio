@@ -254,6 +254,11 @@
       </section>
 
       <aside class="side" aria-label="Projects">
+        <div id="paidWrap" hidden>
+          <div class="col-head"><span class="col-label">Paid to you</span></div>
+          <div id="paidList"></div>
+          <div class="col-head" style="margin-top:26px"></div>
+        </div>
         <div class="col-head"><span class="col-label">Projects</span></div>
         <div class="panel-grid" id="sharedGrid"></div>
         <div class="col-head" style="margin-top:26px"><span class="col-label">New from the crew</span></div>
@@ -451,6 +456,30 @@ uploadFile.addEventListener("change", async () => {
     try {
       const me = await (await fetch(API + "/api/account/me", { headers: { "Authorization": "Bearer " + acctToken() } })).json();
       canUpload = (me.creators || []).includes(NAME);
+      // Payments to this creator, visible only to the signed-in owner of the card.
+      if (canUpload) {
+        const mine = (me.payments || []).filter(p => p.creator === NAME);
+        if (mine.length) {
+          const total = mine.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+          const list = document.getElementById("paidList");
+          list.innerHTML = "";
+          const tot = document.createElement("div");
+          tot.className = "up-title";
+          tot.style.margin = "0 0 8px";
+          tot.textContent = "Total: $" + total.toFixed(2);
+          list.appendChild(tot);
+          mine.forEach(p => {
+            const row = document.createElement("div");
+            row.className = "empty-note";
+            row.style.textAlign = "left";
+            row.style.padding = "10px 12px";
+            row.style.marginBottom = "8px";
+            row.textContent = "$" + (Number(p.amount) || 0).toFixed(2) + (p.note ? " — " + p.note : "") + "  ·  " + (p.created_at || "").slice(0, 10);
+            list.appendChild(row);
+          });
+          document.getElementById("paidWrap").hidden = false;
+        }
+      }
     } catch (_) {}
   }
   uploadBtn.style.display = canUpload ? "" : "none";
