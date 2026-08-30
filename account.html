@@ -77,13 +77,18 @@
         <div class="tab" id="tabLogin">Log in</div>
       </div>
       <form id="authForm" novalidate>
-        <label for="uName">Username</label>
-        <input id="uName" type="text" autocomplete="username" maxlength="32">
+        <label for="uName">Username or email</label>
+        <input id="uName" type="text" autocomplete="username" maxlength="254">
+        <p class="msg" id="gmailNudge"></p>
         <label for="uPass">Password</label>
         <input id="uPass" type="password" autocomplete="current-password" maxlength="200">
         <button type="submit" class="btn" id="authSubmit" style="width:100%">Create account</button>
         <p class="msg" id="authMsg"></p>
       </form>
+      <div id="gWrap" hidden>
+        <div style="text-align:center;font-size:11px;letter-spacing:.2em;color:var(--muted);margin:16px 0 10px">— OR —</div>
+        <div id="gBtn" style="display:flex;justify-content:center"></div>
+      </div>
     </div>
 
     <!-- LOGGED IN: dashboard -->
@@ -129,6 +134,31 @@ const KEY = "wizAcct";
 function tok(){ try { return localStorage.getItem(KEY) || ""; } catch(_) { return ""; } }
 function setTok(t){ try { t ? localStorage.setItem(KEY,t) : localStorage.removeItem(KEY); } catch(_){} }
 function authHeaders(){ const t=tok(); return t ? { "Authorization":"Bearer "+t } : {}; }
+function isGmail(s){ return /@(gmail|googlemail)\.com$/i.test(s||""); }
+
+/* ---- Sign in with Google (members) ---- */
+async function initGoogle(){
+  let clientId = "";
+  try { clientId = (await (await fetch(API+"/api/login-config")).json()).google_client_id || ""; } catch(_){}
+  if (!clientId) return; // Google not configured → button stays hidden
+  function boot(){
+    if (!(window.google && google.accounts && google.accounts.id)) { setTimeout(boot, 300); return; }
+    google.accounts.id.initialize({ client_id: clientId, callback: onGoogle });
+    google.accounts.id.renderButton(document.getElementById("gBtn"), { theme:"outline", size:"large", text:"continue_with", shape:"pill" });
+    document.getElementById("gWrap").hidden = false;
+  }
+  boot();
+}
+async function onGoogle(resp){
+  try {
+    const d = await api("/api/account/glogin", { method:"POST", body: JSON.stringify({ credential: resp.credential }) });
+    setTok(d.token);
+    render();
+  } catch(err){
+    const m = document.getElementById("authMsg");
+    m.textContent = err.message; m.className = "msg err";
+  }
+}
 
 async function api(path, opts){
   opts = opts || {};
@@ -158,6 +188,17 @@ function setMode(m){
 }
 tabSignup.onclick = ()=>setMode("signup");
 tabLogin.onclick = ()=>setMode("login");
+
+// Live nudge: a Gmail belongs in the Google button, not a password account.
+const gmailNudge = document.getElementById("gmailNudge");
+document.getElementById("uName").addEventListener("input", function(){
+  if (isGmail(this.value.trim())){
+    gmailNudge.textContent = "That's a Gmail — use the Google button below so you don't make a second account.";
+    gmailNudge.className = "msg err";
+  } else {
+    gmailNudge.className = "msg";
+  }
+});
 
 document.getElementById("authForm").addEventListener("submit", async e=>{
   e.preventDefault();
@@ -275,7 +316,9 @@ async function render(){
 }
 
 render();
+initGoogle();
 </script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 </body>
 </html>
