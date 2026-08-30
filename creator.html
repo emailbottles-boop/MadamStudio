@@ -245,7 +245,8 @@
         <div class="col-head">
           <span class="col-label">Uploads</span>
           <span style="flex:1"></span>
-          <button class="btn" id="uploadBtn">Upload</button>
+          <button class="btn" id="uploadBtn" style="display:none">Upload</button>
+          <a class="btn" id="hubSignin" href="account.html" style="display:none">Sign in to upload</a>
           <input type="file" id="uploadFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none">
         </div>
         <p class="up-msg" id="uploadMsg"></p>
@@ -284,6 +285,9 @@ const uploadGrid = document.getElementById("uploadGrid");
 const uploadBtn = document.getElementById("uploadBtn");
 const uploadFile = document.getElementById("uploadFile");
 const uploadMsg = document.getElementById("uploadMsg");
+
+// Member session token (set on account.html). Upload is gated on it server-side.
+function acctToken(){ try { return localStorage.getItem("wizAcct") || ""; } catch(_) { return ""; } }
 
 function initials(name) {
   return name.split(/\s+/).map(w => w[0] || "").join("").slice(0, 2).toUpperCase() || "?";
@@ -386,7 +390,7 @@ uploadFile.addEventListener("change", async () => {
   try {
     const res = await fetch(API + "/api/upload-work?creator=" + encodeURIComponent(NAME) + "&title=" + encodeURIComponent(title), {
       method: "POST",
-      headers: { "Content-Type": f.type },
+      headers: { "Content-Type": f.type, "Authorization": "Bearer " + acctToken() },
       body: f,
     });
     ok = res.ok;
@@ -394,7 +398,7 @@ uploadFile.addEventListener("change", async () => {
   } catch (_) {}
   uploadBtn.disabled = false;
   if (ok) {
-    uploadMsg.textContent = "Uploaded ✓";
+    uploadMsg.textContent = "Uploaded ✓ — pending review";
     uploadMsg.className = "up-msg ok";
     loadUploads();
   } else {
@@ -437,6 +441,20 @@ uploadFile.addEventListener("change", async () => {
     }
   }
   whoBadge.style.display = verified.includes(NAME) ? "inline-block" : "none";
+
+  // Hub mode: the Upload button appears only if the signed-in account has
+  // verified access to THIS creator. Everyone else sees a "sign in" link, and
+  // the server enforces it regardless of what the page shows.
+  const signin = document.getElementById("hubSignin");
+  let canUpload = false;
+  if (acctToken()) {
+    try {
+      const me = await (await fetch(API + "/api/account/me", { headers: { "Authorization": "Bearer " + acctToken() } })).json();
+      canUpload = (me.creators || []).includes(NAME);
+    } catch (_) {}
+  }
+  uploadBtn.style.display = canUpload ? "" : "none";
+  signin.style.display = canUpload ? "none" : "";
 
   fillGrid(mineGrid, panels.filter(p => p.creator === NAME), panelEl, "Nothing yet.");
   fillGrid(sharedGrid, panels.filter(p => (p.creator || "").toLowerCase() === "shared"), panelEl, "No projects yet.");
