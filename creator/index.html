@@ -82,11 +82,11 @@
     padding: 3px 8px;
   }
 
-  /* ── three columns: work / uploads / projects ─────── */
+  /* ── two halves: your work / shared with the crew ─── */
   .split {
     display: grid;
-    grid-template-columns: 1fr 1.15fr 250px;
-    gap: 30px;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
     align-items: start;
   }
 
@@ -233,30 +233,27 @@
       <div style="margin-top:14px"><a class="btn primary" href="/account/" style="text-decoration:none">Claim your card</a></div>
     </div>
     <div class="split" id="workArea">
-      <section aria-label="Work">
-        <div class="col-head"><span class="col-label">Work</span></div>
-        <div class="panel-grid" id="mineGrid"></div>
-      </section>
-
-      <section class="mid" aria-label="Uploads">
+      <!-- LEFT HALF: your own work — what the admins assigned to you, plus what you upload -->
+      <section aria-label="Your work">
         <div class="col-head">
-          <span class="col-label">Uploads</span>
+          <span class="col-label">Your work</span>
           <span style="flex:1"></span>
           <button class="btn" id="uploadBtn" style="display:none">Upload</button>
           <a class="btn" id="hubSignin" href="/account/" style="display:none">Sign in to upload</a>
           <input type="file" id="uploadFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none">
         </div>
         <p class="up-msg" id="uploadMsg"></p>
+        <div id="paidWrap" hidden>
+          <div class="col-head" style="margin-top:4px"><span class="col-label">Paid to you</span></div>
+          <div id="paidList"></div>
+        </div>
         <div class="panel-grid" id="uploadGrid" style="margin-top:10px"></div>
+        <div class="panel-grid" id="mineGrid" style="margin-top:14px"></div>
       </section>
 
-      <aside class="side" aria-label="Projects">
-        <div id="paidWrap" hidden>
-          <div class="col-head"><span class="col-label">Paid to you</span></div>
-          <div id="paidList"></div>
-          <div class="col-head" style="margin-top:26px"></div>
-        </div>
-        <div class="col-head"><span class="col-label">Projects</span></div>
+      <!-- RIGHT HALF: what the admins share with the whole crew -->
+      <aside class="side" aria-label="Shared with the crew">
+        <div class="col-head"><span class="col-label">Shared with the crew</span></div>
         <div class="panel-grid" id="sharedGrid"></div>
         <div class="col-head" style="margin-top:26px"><span class="col-label">New from the crew</span></div>
         <div class="panel-grid" id="crewGrid"></div>
