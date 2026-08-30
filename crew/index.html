@@ -5,22 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wizard ID — Madam Studio</title>
 <meta name="description" content="Crew verification for Madam Studio. Worked on Wizard Shit? Claim your credit identity card and the producers will verify you.">
-<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="icon" type="image/png" href="/img/favicon.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap');
 
   /* Flat light-blue theme — matches index.html, no gradients. */
-  :root {
-    --bg:      #d9e9f4;
-    --panel:   #ffffff;
-    --panel-2: #eef6fb;
-    --border:  #b3cfe1;
-    --text:    #16303f;
-    --text-2:  #3d5b6e;
-    --muted:   #5b7c92;
-    --accent:  #2176b5;
-    --accent-deep: #175a8c;
-    --verified: #1e8e5a;
+  :root{
+    --bg:#4a1020; --panel:#611829; --panel-2:#742138; --border:#8d3a4e;
+    --text:#f7ecd9; --text-2:#e7cfa4; --muted:#cf9bad;
+    --accent:#f3c53f; --accent-deep:#d99a1f; --accent-ink:#3a1020;
+    --verified:#6fe0a0; --paid:#f3c53f;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -218,7 +212,7 @@
   .btn.primary {
     background: var(--accent);
     border-color: var(--accent);
-    color: #fff;
+    color: var(--accent-ink);
   }
   .btn.primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
   .btn:disabled { opacity: 0.6; cursor: wait; }
@@ -256,8 +250,8 @@
 <body>
 
   <nav class="corner-nav">
-    <a class="studio-btn" href="account.html">Account</a>
-    <a class="studio-btn" href="index.html">Madam Studio</a>
+    <a class="studio-btn" href="/account/">Account</a>
+    <a class="studio-btn" href="/">Madam Studio</a>
   </nav>
 
   <header class="head">
@@ -368,7 +362,7 @@ function openModal(person) {
   modalName.textContent = person.name;
   modalPhoto.replaceWith(Object.assign(photoEl(person), { id: "modalPhoto" }));
   modalMsg.className = "modal-msg";
-  const pageHref = "creator.html?name=" + encodeURIComponent(person.name);
+  const pageHref = "/creator/?name=" + encodeURIComponent(person.name);
 
   if (!crewMode) {
     modalSub.textContent = "Head to their page to see their work.";
@@ -378,12 +372,12 @@ function openModal(person) {
   } else if (!me) {
     modalSub.textContent = "Sign in to claim your card.";
     modalAction.textContent = "Sign in";
-    modalAction.href = "account.html";
+    modalAction.href = "/account/";
     modalAction.onclick = null;
   } else if (!me.account.email) {
     modalSub.textContent = "Tie your email on your account page first, then come back to claim.";
     modalAction.textContent = "Go to account";
-    modalAction.href = "account.html";
+    modalAction.href = "/account/";
     modalAction.onclick = null;
   } else if ((me.creators || []).includes(person.name)) {
     modalSub.textContent = "This card is already yours.";
@@ -462,8 +456,8 @@ function renderFunnel() {
   };
   if (!me) {
     prompt.textContent = "The people behind Wizard Shit. Make an account to claim your card, apply, or just follow.";
-    add("Sign in / sign up", "primary", null, "account.html");
-    add("Apply for a position", "", null, "apply.html");
+    add("Sign in / sign up", "primary", null, "/account/");
+    add("Apply for a position", "", null, "/apply/");
     return;
   }
   if (crewMode) {
@@ -485,7 +479,7 @@ function renderFunnel() {
     prompt.textContent = "Following as a fan ✨ Browse the crew below.";
     f.innerHTML = "";
   });
-  add("I'd like to apply", "", null, "apply.html");
+  add("I'd like to apply", "", null, "/apply/");
 }
 
 /* load the crew + verified badges + who I am */

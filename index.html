@@ -5,26 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Madam Studio</title>
 <meta name="description" content="Madam Studio — the independent animation studio behind Wizard Shit. Fresh work from the studio feed: sketches, paintings, boards, and merch.">
-<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="icon" type="image/png" href="/img/favicon.png">
 <meta property="og:title" content="Madam Studio">
 <meta property="og:description" content="The independent animation studio behind Wizard Shit.">
 <meta property="og:url" content="https://madamwizzy.com/">
 <link rel="canonical" href="https://madamwizzy.com/">
-<meta property="og:image" content="img/hero.webp">
+<meta property="og:image" content="/img/hero.webp">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap');
 
   /* Flat light-blue theme — solid colors only, no gradients anywhere. */
-  :root {
-    --bg:      #d9e9f4;
-    --panel:   #ffffff;
-    --panel-2: #eef6fb;
-    --border:  #b3cfe1;
-    --text:    #16303f;
-    --text-2:  #3d5b6e;
-    --muted:   #5b7c92;
-    --accent:  #2176b5;
-    --accent-deep: #175a8c;
+  :root{
+    --bg:#4a1020; --panel:#611829; --panel-2:#742138; --border:#8d3a4e;
+    --text:#f7ecd9; --text-2:#e7cfa4; --muted:#cf9bad;
+    --accent:#f3c53f; --accent-deep:#d99a1f; --accent-ink:#3a1020;
+    --verified:#6fe0a0; --paid:#f3c53f;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -96,7 +91,7 @@
     padding: 13vh 24px 48px;
     text-align: center;
     /* Solid night blue shows until img/hero.png exists or while it loads. */
-    background: #202a5b url('img/hero.webp') center 35% / cover no-repeat;
+    background: #202a5b url('/img/hero.webp') center 35% / cover no-repeat;
   }
 
   .eyebrow {
@@ -325,9 +320,9 @@
 <body>
 
   <nav class="corner-nav">
-    <a class="studio-btn" href="account.html">Account</a>
-    <a class="studio-btn" href="apply.html">Apply</a>
-    <a class="studio-btn" href="crew.html">Wizard ID</a>
+    <a class="studio-btn" href="/account/">Account</a>
+    <a class="studio-btn" href="/apply/">Apply</a>
+    <a class="studio-btn" href="/crew/">Wizard ID</a>
     <a class="studio-btn" href="https://wizardshit.store" target="_blank" rel="noopener">Wizard Shit</a>
   </nav>
 

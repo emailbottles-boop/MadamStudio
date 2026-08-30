@@ -5,20 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Apply — Madam Studio</title>
 <meta name="description" content="Apply to work on Wizard Shit. Send a portfolio and a note; the producers read every application.">
-<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="icon" type="image/png" href="/img/favicon.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap');
 
-  :root {
-    --bg:      #d9e9f4;
-    --panel:   #ffffff;
-    --panel-2: #eef6fb;
-    --border:  #b3cfe1;
-    --text:    #16303f;
-    --muted:   #5b7c92;
-    --accent:  #2176b5;
-    --accent-deep: #175a8c;
-    --ok:      #1e8e5a;
+  :root{
+    --bg:#4a1020; --panel:#611829; --panel-2:#742138; --border:#8d3a4e;
+    --text:#f7ecd9; --text-2:#e7cfa4; --muted:#cf9bad;
+    --accent:#f3c53f; --accent-deep:#d99a1f; --accent-ink:#3a1020;
+    --verified:#6fe0a0; --paid:#f3c53f;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -97,7 +92,7 @@
     cursor: pointer;
     border: 1px solid var(--accent);
     background: var(--accent);
-    color: #fff;
+    color: var(--accent-ink);
     transition: background 0.15s, border-color 0.15s;
   }
   .btn:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
@@ -123,7 +118,7 @@
 <body>
 
   <nav class="corner-nav">
-    <a class="studio-btn" href="index.html">Madam Studio</a>
+    <a class="studio-btn" href="/">Madam Studio</a>
   </nav>
 
   <div class="wrap">

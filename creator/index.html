@@ -5,23 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Creator — Madam Studio</title>
 <meta name="description" content="A Madam Studio creator's page: their work, uploads, and projects.">
-<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="icon" type="image/png" href="/img/favicon.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap');
 
   /* Flat light-blue theme — matches index.html, no gradients. */
-  :root {
-    --bg:      #d9e9f4;
-    --panel:   #ffffff;
-    --panel-2: #eef6fb;
-    --border:  #b3cfe1;
-    --text:    #16303f;
-    --text-2:  #3d5b6e;
-    --muted:   #5b7c92;
-    --accent:  #2176b5;
-    --accent-deep: #175a8c;
-    --verified: #1e8e5a;
-    --paid:    #a06a10;
+  :root{
+    --bg:#4a1020; --panel:#611829; --panel-2:#742138; --border:#8d3a4e;
+    --text:#f7ecd9; --text-2:#e7cfa4; --muted:#cf9bad;
+    --accent:#f3c53f; --accent-deep:#d99a1f; --accent-ink:#3a1020;
+    --verified:#6fe0a0; --paid:#f3c53f;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -177,7 +170,7 @@
     cursor: pointer;
     border: 1px solid var(--accent);
     background: var(--accent);
-    color: #fff;
+    color: var(--accent-ink);
     transition: background 0.15s, border-color 0.15s;
   }
   .btn:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
@@ -221,8 +214,8 @@
 <body>
 
   <nav class="corner-nav">
-    <a class="studio-btn" href="crew.html">Wizard ID</a>
-    <a class="studio-btn" href="index.html">Madam Studio</a>
+    <a class="studio-btn" href="/crew/">Wizard ID</a>
+    <a class="studio-btn" href="/">Madam Studio</a>
   </nav>
 
   <div class="wrap">
@@ -237,7 +230,7 @@
 
     <div id="crewWall" class="empty-note" style="display:none;max-width:520px;margin:10px auto 60px">
       This is the crew work portal. Sign in with a verified Madam Studio account to see the work.
-      <div style="margin-top:14px"><a class="btn primary" href="account.html" style="text-decoration:none">Sign in</a></div>
+      <div style="margin-top:14px"><a class="btn primary" href="/account/" style="text-decoration:none">Sign in</a></div>
     </div>
     <div class="split" id="workArea">
       <section aria-label="Work">
@@ -250,7 +243,7 @@
           <span class="col-label">Uploads</span>
           <span style="flex:1"></span>
           <button class="btn" id="uploadBtn" style="display:none">Upload</button>
-          <a class="btn" id="hubSignin" href="account.html" style="display:none">Sign in to upload</a>
+          <a class="btn" id="hubSignin" href="/account/" style="display:none">Sign in to upload</a>
           <input type="file" id="uploadFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none">
         </div>
         <p class="up-msg" id="uploadMsg"></p>
@@ -419,7 +412,7 @@ uploadFile.addEventListener("change", async () => {
 });
 
 (async () => {
-  if (!NAME) { location.replace("crew.html"); return; }
+  if (!NAME) { location.replace("/crew/"); return; }
 
   document.title = NAME + " — Madam Studio";
   whoName.textContent = NAME;
