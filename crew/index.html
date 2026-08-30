@@ -364,7 +364,7 @@ function openModal(person) {
   const pageHref = "/creator/?name=" + encodeURIComponent(person.name);
 
   if (!crewMode) {
-    modalSub.textContent = "Head to their page to see their work.";
+    modalSub.textContent = "Visit their page.";
     modalAction.textContent = "Visit page";
     modalAction.href = pageHref;
     modalAction.onclick = null;
