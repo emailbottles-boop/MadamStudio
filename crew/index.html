@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wizard ID — Madam Studio</title>
+<title>Wizard Crew — Madam Studio</title>
 <meta name="description" content="Crew verification for Madam Studio. Worked on Wizard Shit? Claim your credit identity card and the producers will verify you.">
 <link rel="icon" type="image/png" href="/img/favicon.png">
 <style>
@@ -255,9 +255,8 @@
   </nav>
 
   <header class="head">
-    <p class="eyebrow">The crew</p>
-    <h1>Wizard ID</h1>
-    <p id="funnelPrompt">The people behind Wizard Shit. Tap a card to see their page.</p>
+    <h1>Wizard Crew</h1>
+    <p id="funnelPrompt"></p>
     <div id="funnel" class="funnel"></div>
   </header>
 
@@ -455,13 +454,13 @@ function renderFunnel() {
     return b;
   };
   if (!me) {
-    prompt.textContent = "The people behind Wizard Shit. Make an account to claim your card, apply, or just follow.";
+    prompt.textContent = "";
     add("Sign in / sign up", "primary", null, "/account/");
     add("Apply for a position", "", null, "/apply/");
     return;
   }
   if (crewMode) {
-    prompt.textContent = "Tap your card below to claim it.";
+    prompt.textContent = "Select your wizard card to access your Madam Studio account.";
     const note = document.createElement("div");
     note.className = "note";
     note.textContent = "Not you? ";
