@@ -235,7 +235,11 @@
       </div>
     </header>
 
-    <div class="split">
+    <div id="crewWall" class="empty-note" style="display:none;max-width:520px;margin:10px auto 60px">
+      This is the crew work portal. Sign in with a verified Madam Studio account to see the work.
+      <div style="margin-top:14px"><a class="btn primary" href="account.html" style="text-decoration:none">Sign in</a></div>
+    </div>
+    <div class="split" id="workArea">
       <section aria-label="Work">
         <div class="col-head"><span class="col-label">Work</span></div>
         <div class="panel-grid" id="mineGrid"></div>
@@ -365,10 +369,12 @@ function fillGrid(grid, items, make, emptyText) {
   items.forEach(it => grid.appendChild(make(it)));
 }
 
+function portalHeaders(){ const t = acctToken(); return t ? { "Authorization":"Bearer "+t } : {}; }
+
 async function loadUploads() {
   let ups = [];
   try {
-    const res = await fetch(API + "/api/uploads-public?name=" + encodeURIComponent(NAME));
+    const res = await fetch(API + "/api/portal/uploads?name=" + encodeURIComponent(NAME), { headers: portalHeaders() });
     if (res.ok) ups = (await res.json()).uploads || [];
   } catch (_) {}
   fillGrid(uploadGrid, ups, u => uploadEl(u, false), "No uploads yet.");
@@ -377,7 +383,7 @@ async function loadUploads() {
 async function loadCrewUploads() {
   let ups = [];
   try {
-    const res = await fetch(API + "/api/uploads-public");
+    const res = await fetch(API + "/api/portal/uploads", { headers: portalHeaders() });
     if (res.ok) ups = ((await res.json()).uploads || []).filter(u => u.creator !== NAME).slice(0, 6);
   } catch (_) {}
   fillGrid(document.getElementById("crewGrid"), ups, u => uploadEl(u, true), "Nothing yet.");
@@ -419,27 +425,25 @@ uploadFile.addEventListener("change", async () => {
   whoName.textContent = NAME;
   whoPhoto.textContent = initials(NAME);
 
-  let credits = [], panels = [], verified = [];
+  // Public header only: name / role / photo / verified badge. These come from
+  // the public credits + claims-public — the WORK below is gated.
+  let credits = [], verified = [];
   try {
     const res = await fetch(API + "/api/content");
-    if (res.ok) {
-      const data = await res.json();
-      credits = data.credits || [];
-      panels = data.panels || [];
-    }
+    if (res.ok) credits = (await res.json()).credits || [];
   } catch (_) {}
   try {
     const res = await fetch(API + "/api/claims-public");
     if (res.ok) verified = (await res.json()).verified || [];
   } catch (_) {}
 
-  const me = credits.find(c => c.name === NAME);
-  if (me) {
-    whoRoles.textContent = me.roles || "";
-    if (me.photo) {
+  const meCredit = credits.find(c => c.name === NAME);
+  if (meCredit) {
+    whoRoles.textContent = meCredit.roles || "";
+    if (meCredit.photo) {
       const img = document.createElement("img");
       img.alt = "";
-      img.src = imgUrl(me.photo);
+      img.src = imgUrl(meCredit.photo);
       img.onerror = () => { img.remove(); whoPhoto.textContent = initials(NAME); };
       whoPhoto.textContent = "";
       whoPhoto.appendChild(img);
@@ -447,15 +451,31 @@ uploadFile.addEventListener("change", async () => {
   }
   whoBadge.style.display = verified.includes(NAME) ? "inline-block" : "none";
 
-  // Hub mode: the Upload button appears only if the signed-in account has
-  // verified access to THIS creator. Everyone else sees a "sign in" link, and
-  // the server enforces it regardless of what the page shows.
-  const signin = document.getElementById("hubSignin");
-  let canUpload = false;
+  // Who's viewing? The work area only renders for verified crew (an account
+  // with at least one approved card). Everyone else — logged out or a plain
+  // fan — gets the wall, and the server refuses the portal calls anyway.
+  let me = null;
   if (acctToken()) {
-    try {
-      const me = await (await fetch(API + "/api/account/me", { headers: { "Authorization": "Bearer " + acctToken() } })).json();
-      canUpload = (me.creators || []).includes(NAME);
+    try { me = await (await fetch(API + "/api/account/me", { headers: { "Authorization": "Bearer " + acctToken() } })).json(); } catch (_) {}
+  }
+  const isCrew = !!(me && (me.creators || []).length);
+  if (!isCrew) {
+    document.getElementById("workArea").style.display = "none";
+    document.getElementById("crewWall").style.display = "";
+    return;
+  }
+
+  // Verified crew: fetch the gated work panels.
+  let panels = [];
+  try {
+    const res = await fetch(API + "/api/portal/panels", { headers: portalHeaders() });
+    if (res.ok) panels = (await res.json()).panels || [];
+  } catch (_) {}
+
+  const signin = document.getElementById("hubSignin");
+  let canUpload = (me.creators || []).includes(NAME);
+  {
+    {
       // Payments to this creator, visible only to the signed-in owner of the card.
       if (canUpload) {
         const mine = (me.payments || []).filter(p => p.creator === NAME);
@@ -480,7 +500,7 @@ uploadFile.addEventListener("change", async () => {
           document.getElementById("paidWrap").hidden = false;
         }
       }
-    } catch (_) {}
+    }
   }
   uploadBtn.style.display = canUpload ? "" : "none";
   signin.style.display = canUpload ? "none" : "";
