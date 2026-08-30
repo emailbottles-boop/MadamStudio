@@ -79,9 +79,12 @@
       <form id="authForm" novalidate>
         <label for="uName">Username or email</label>
         <input id="uName" type="text" autocomplete="username" maxlength="254">
-        <p class="msg" id="gmailNudge"></p>
         <label for="uPass">Password</label>
         <input id="uPass" type="password" autocomplete="current-password" maxlength="200">
+        <div id="confirmWrap">
+          <label for="uPass2">Confirm password</label>
+          <input id="uPass2" type="password" autocomplete="new-password" maxlength="200">
+        </div>
         <button type="submit" class="btn" id="authSubmit" style="width:100%">Create account</button>
         <p class="msg" id="authMsg"></p>
       </form>
@@ -134,7 +137,6 @@ const KEY = "wizAcct";
 function tok(){ try { return localStorage.getItem(KEY) || ""; } catch(_) { return ""; } }
 function setTok(t){ try { t ? localStorage.setItem(KEY,t) : localStorage.removeItem(KEY); } catch(_){} }
 function authHeaders(){ const t=tok(); return t ? { "Authorization":"Bearer "+t } : {}; }
-function isGmail(s){ return /@(gmail|googlemail)\.com$/i.test(s||""); }
 
 /* ---- Sign in with Google (members) ---- */
 async function initGoogle(){
@@ -184,27 +186,22 @@ function setMode(m){
   tabLogin.classList.toggle("on", m==="login");
   authSubmit.textContent = m==="signup" ? "Create account" : "Log in";
   uPass.autocomplete = m==="signup" ? "new-password" : "current-password";
+  document.getElementById("confirmWrap").hidden = (m!=="signup"); // confirm only on sign-up
   authMsg.className = "msg";
 }
 tabSignup.onclick = ()=>setMode("signup");
 tabLogin.onclick = ()=>setMode("login");
-
-// Live nudge: a Gmail belongs in the Google button, not a password account.
-const gmailNudge = document.getElementById("gmailNudge");
-document.getElementById("uName").addEventListener("input", function(){
-  if (isGmail(this.value.trim())){
-    gmailNudge.textContent = "That's a Gmail — use the Google button below so you don't make a second account.";
-    gmailNudge.className = "msg err";
-  } else {
-    gmailNudge.className = "msg";
-  }
-});
 
 document.getElementById("authForm").addEventListener("submit", async e=>{
   e.preventDefault();
   authMsg.className = "msg";
   const username = document.getElementById("uName").value.trim();
   const password = uPass.value;
+  if (mode==="signup" && password !== document.getElementById("uPass2").value){
+    authMsg.textContent = "Passwords don't match — please retype them.";
+    authMsg.className = "msg err";
+    return;
+  }
   authSubmit.disabled = true;
   try {
     const d = await api("/api/account/"+(mode==="signup"?"signup":"login"), {

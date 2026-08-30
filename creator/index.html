@@ -229,8 +229,8 @@
     </header>
 
     <div id="crewWall" class="empty-note" style="display:none;max-width:520px;margin:10px auto 60px">
-      This is the crew work portal. Sign in with a verified Madam Studio account to see the work.
-      <div style="margin-top:14px"><a class="btn primary" href="/account/" style="text-decoration:none">Sign in</a></div>
+      This is the Madam Studio crew work portal. If you work here, claim your card on your account to request access — a producer verifies it, then the work opens.
+      <div style="margin-top:14px"><a class="btn primary" href="/account/" style="text-decoration:none">Claim your card</a></div>
     </div>
     <div class="split" id="workArea">
       <section aria-label="Work">
@@ -445,16 +445,20 @@ uploadFile.addEventListener("change", async () => {
   whoBadge.style.display = verified.includes(NAME) ? "inline-block" : "none";
 
   // Who's viewing? The work area only renders for verified crew (an account
-  // with at least one approved card). Everyone else — logged out or a plain
-  // fan — gets the wall, and the server refuses the portal calls anyway.
+  // with at least one approved card), and the server refuses the portal calls
+  // anyway. A logged-out visitor — a "normie" browsing the studio — never sees
+  // the work portal at all: they just get the public profile above. Only a
+  // signed-in member who isn't yet verified crew sees the funnel to request
+  // access.
   let me = null;
   if (acctToken()) {
     try { me = await (await fetch(API + "/api/account/me", { headers: { "Authorization": "Bearer " + acctToken() } })).json(); } catch (_) {}
   }
+  const loggedIn = !!(me && me.account);
   const isCrew = !!(me && (me.creators || []).length);
   if (!isCrew) {
     document.getElementById("workArea").style.display = "none";
-    document.getElementById("crewWall").style.display = "";
+    document.getElementById("crewWall").style.display = loggedIn ? "" : "none";
     return;
   }
 
