@@ -235,6 +235,113 @@
   }
   .col-label { font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin: 0.2rem 0 0.7rem; font-weight: 700; }
   .col-label:not(:first-child) { margin-top: 1.4rem; }
+
+  /* ===== Creators tab · Board Editor (scoped) ===== */
+  .cr-editor { --cr-border: #8d3a4e; --cr-border-soft: #6e2739; --cr-text2: #e7cfa4; --cr-verified: #6fe0a0; --cr-tile: #380e1b; }
+  .cr-top { margin-bottom: 0.5rem; }
+  .cr-eyebrow { font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 5px; }
+  .cr-h1b { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 22px; }
+  .cr-sub { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+
+  .cr-cardrow { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 14px 0 6px; }
+  .cr-pcard { position: relative; background: linear-gradient(180deg, var(--card), var(--card2)); border: 1px solid var(--cr-border-soft); border-radius: 12px; padding: 11px; cursor: pointer; transition: 0.15s; }
+  .cr-pcard:hover { border-color: var(--cr-border); }
+  .cr-pcard.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .cr-row1 { display: flex; align-items: center; gap: 9px; }
+  .cr-av { width: 32px; height: 32px; border-radius: 50%; flex: none; display: grid; place-items: center; font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 12px; color: var(--accent-ink); background-size: cover; background-position: center; }
+  .cr-nm { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 13px; line-height: 1.1; }
+  .cr-rl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .cr-thumbs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-top: 9px; }
+  .cr-thumbs i { height: 24px; border-radius: 4px; display: block; background: var(--cr-tile); border: 1px solid var(--cr-border-soft); background-size: cover; background-position: center; }
+  .cr-gtag { margin-top: 9px; display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--cr-text2); background: #3a0f1d; border: 1px solid var(--cr-border-soft); border-radius: 7px; padding: 4px 7px; cursor: pointer; }
+  .cr-gtag:hover { border-color: var(--cr-border); }
+  .cr-gdot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .cr-chev { margin-left: auto; color: var(--muted); }
+  .cr-gmenu { margin-top: 6px; display: flex; flex-direction: column; gap: 3px; background: #3a0f1d; border: 1px solid var(--cr-border-soft); border-radius: 8px; padding: 5px; }
+  .cr-gmenu button { text-align: left; background: none; border: 1px solid transparent; border-radius: 6px; color: var(--text); font: inherit; font-size: 11px; padding: 5px 7px; cursor: pointer; }
+  .cr-gmenu button:hover { background: #5c1727; border-color: var(--cr-border); }
+  .cr-gmenu .cr-gmenu-none { color: var(--muted); }
+
+  .cr-work { display: grid; grid-template-columns: 176px 1fr 128px; gap: 14px; padding: 12px 0 10px; align-items: start; }
+  @media (max-width: 640px) { .cr-work { grid-template-columns: 1fr; } }
+  .cr-col { min-width: 0; }
+  .cr-colh { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .cr-panelcard { background: linear-gradient(180deg, var(--card), var(--card2)); border: 1px solid var(--cr-border-soft); border-radius: 13px; padding: 13px; }
+
+  .cr-glist { display: flex; flex-direction: column; gap: 5px; }
+  .cr-gbtn { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 9px; border: 1px solid transparent; cursor: pointer; background: none; color: var(--text); text-align: left; font: inherit; font-size: 13px; width: 100%; transition: 0.15s; }
+  .cr-gbtn:hover { background: #5c1727; }
+  .cr-gbtn.on { background: #5c1727; border-color: var(--accent); }
+  .cr-gc { margin-left: auto; font-size: 10px; color: var(--muted); }
+  .cr-gnone { margin-top: 8px; font-size: 11px; color: var(--muted); text-align: center; padding: 7px; border: 1px dashed var(--cr-border-soft); border-radius: 8px; cursor: pointer; }
+  .cr-gnone:hover { border-color: var(--cr-border); color: var(--cr-text2); }
+
+  .cr-stage { background: #2f0a15; border: 1px solid var(--cr-border-soft); border-radius: 14px; overflow: hidden; min-height: 420px; }
+  .cr-stagebar { display: flex; align-items: center; gap: 9px; padding: 11px 14px; border-bottom: 1px solid var(--cr-border-soft); background: #360b18; font-size: 12px; color: var(--muted); }
+  .cr-crumb b { color: var(--text); font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 14px; }
+  .cr-mode { margin-left: auto; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-ink); background: var(--accent); border-radius: 999px; padding: 3px 10px; font-weight: 700; }
+  .cr-mode.grp { color: var(--cr-verified); background: none; border: 1px solid #3f6e52; }
+  .cr-stageinner { }
+  .cr-ssplit { display: grid; grid-template-columns: 1fr 1px 1fr; }
+  .cr-ssplit.single { grid-template-columns: 1fr; }
+  @media (max-width: 520px) { .cr-ssplit { grid-template-columns: 1fr; } .cr-sdiv { display: none; } }
+  .cr-sdiv { background: var(--cr-border-soft); }
+  .cr-sside { padding: 13px; min-width: 0; }
+  .cr-slabel { font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
+  .cr-slabel .p { color: var(--accent-ink); background: var(--accent); border-radius: 5px; padding: 2px 7px; }
+  .cr-slabel .g { color: var(--cr-verified); border: 1px solid #3f6e52; border-radius: 5px; padding: 2px 7px; }
+  .cr-note { font-size: 11.5px; color: var(--muted); margin-bottom: 12px; }
+  .cr-readonly { font-size: 10px; color: var(--muted); margin-top: 10px; font-style: italic; }
+
+  .cr-box { display: grid; gap: 8px; }
+  .cr-box.split { grid-template-columns: 1fr 1fr; }
+  .cr-box.gallery { grid-template-columns: 1fr 1fr; }
+  .cr-box.gallery .cr-tile:first-child { grid-column: 1 / 3; min-height: 88px; }
+  .cr-box.feed { grid-template-columns: 1fr; }
+  .cr-box.feed .cr-tile { min-height: 82px; }
+  .cr-box.showcase { grid-template-columns: 1fr 1fr; }
+  .cr-box.showcase .cr-tile:first-child { grid-column: 1 / 3; min-height: 100px; }
+  .cr-box.stream { grid-template-columns: 1fr; }
+  .cr-box.stream .cr-tile { min-height: 42px; }
+  .cr-emptybox { grid-column: 1 / -1; text-align: center; color: var(--muted); font-size: 11px; padding: 22px 8px; border: 1px dashed var(--cr-border-soft); border-radius: 7px; }
+
+  .cr-tile { border-radius: 7px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-height: 56px; background: var(--cr-tile); border: 1px solid var(--cr-border-soft); background-size: cover; background-position: center; }
+  .cr-tile .cr-ic { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); opacity: 0.5; }
+  .cr-tile .cr-ic svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .cr-tile .cr-ty { position: absolute; top: 5px; left: 7px; font-size: 7.5px; letter-spacing: 0.11em; text-transform: uppercase; color: var(--muted); z-index: 1; }
+  .cr-tile span { font-size: 9.5px; color: var(--cr-text2); padding: 6px; z-index: 1; font-weight: 500; position: relative; background: linear-gradient(transparent, rgba(0,0,0,0.45)); }
+  .cr-tile .cr-mk { position: absolute; top: 4px; right: 4px; font-size: 8px; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(0,0,0,0.5); border-radius: 999px; padding: 2px 6px; z-index: 1; }
+  .cr-mk.v { color: var(--cr-verified); }
+  .cr-mk.p { color: var(--accent); }
+  .cr-mk.n { color: #fff; }
+
+  .cr-drop { margin-top: 12px; border: 1.5px dashed var(--cr-border); border-radius: 9px; padding: 10px; background: #360b18; }
+  .cr-dcap { font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .cr-drop .btn { margin-right: 6px; margin-bottom: 4px; font-size: 0.76rem; padding: 0.4rem 0.7rem; }
+  .cr-linkform { display: grid; gap: 6px; margin-top: 6px; }
+  .cr-linkform input, .cr-linkform select { width: 100%; background: var(--bg); border: 1px solid var(--border-strong); border-radius: 7px; color: var(--text); padding: 0.4rem 0.55rem; font: inherit; font-size: 0.82rem; }
+  .cr-linkform select { accent-color: var(--accent); }
+
+  .cr-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .cr-chip { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--cr-text2); background: #3a0f1d; border: 1px solid var(--cr-border-soft); border-radius: 999px; padding: 5px 11px; }
+  .cr-chipav { width: 17px; height: 17px; border-radius: 50%; display: grid; place-items: center; font-size: 8px; font-weight: 700; color: var(--accent-ink); flex: none; }
+
+  .cr-rail { display: flex; flex-direction: column; gap: 9px; }
+  .cr-arrbtn { cursor: pointer; border: 1px solid var(--cr-border-soft); background: #3a0f1d; border-radius: 10px; padding: 9px; display: flex; flex-direction: column; gap: 7px; transition: 0.15s; }
+  .cr-arrbtn:hover { border-color: var(--cr-border); }
+  .cr-arrbtn.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .cr-anm { font-size: 11px; font-weight: 600; text-align: center; }
+  .cr-arrbtn.on .cr-anm { color: var(--accent); }
+  .cr-athumb { height: 30px; border-radius: 5px; background: #2f0a15; padding: 4px; display: grid; gap: 3px; }
+  .cr-athumb i { background: var(--cr-border); border-radius: 2px; }
+  .cr-t-split { grid-template-columns: 1fr 1fr; }
+  .cr-t-gallery { grid-template-columns: 1fr 1fr 1fr; }
+  .cr-t-feed { grid-template-rows: 1fr 1fr; }
+  .cr-t-showcase { grid-template-rows: 1.4fr 1fr; grid-template-columns: 1fr 1fr 1fr; }
+  .cr-t-showcase i:first-child { grid-column: 1 / 4; }
+  .cr-t-stream { grid-template-rows: 1fr 1fr 1fr; }
+  .cr-railcap { font-size: 10px; color: var(--muted); text-align: center; margin-top: 8px; line-height: 1.4; }
+  .cr-empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; font-size: 0.85rem; }
 </style>
 </head>
 <body>
@@ -724,94 +831,393 @@
     });
   }
 
-  /* ---- Creators: split founder dashboard ----
-     Left = pick one creator and drop work straight into their feed (lands
-     verified/live immediately). Right = the shared crew activity feed, the
-     same for every founder. Both read the same uploads list. */
-  function uploadCardEl(u, manage) {
-    var card = el('div', 'item' + (u.status === 'new' ? ' unread' : ''));
-    var head = el('div', 'item-head');
-    var thumb = el('a', 'thumb');
-    thumb.href = u.image; thumb.target = '_blank';
-    thumb.style.width = '46px'; thumb.style.height = '46px'; thumb.style.flexShrink = '0';
-    thumb.style.backgroundImage = 'url("' + (u.image || '').replace(/"/g, '%22') + '")';
-    head.appendChild(thumb);
-    head.appendChild(el('strong', 'grow', (manage ? '' : u.creator + ' — ') + (u.title || '(untitled)')));
-    head.appendChild(el('span', 'msg-meta', u.status.toUpperCase() + ' · ' + (u.created_at || '').slice(0, 16)));
-    if (manage) {
-      ['seen', 'verified', 'paid'].forEach(function (s) {
-        if (u.status === s) return;
-        var b = el('button', 'btn', s); b.style.textTransform = 'uppercase';
-        b.onclick = function () { uploadAction(u.id, '/' + s, 'POST'); };
-        head.appendChild(b);
+  /* ---- Creators: Board Editor ----
+     Cards row up top (every creator, with a peek of their content and a group
+     control). Left = the fixed Groups panel. Middle = the split board: for a
+     selected creator, LEFT is their own content (drop images / add links) and
+     RIGHT is the read-only public/shared board; for a selected group, one drop
+     that lands on every member. Right = the vertical Arrangement rail, which
+     sets the selected creator's arrangement (individual) or the public board's
+     arrangement (group). Drives creator-config, public-arrangement, upload-for
+     and upload-link. */
+  var crState = { person: null, group: null, publicArr: null, publicFetched: false, groupMenu: null };
+  var CR_GROUPS = [
+    { key: 'Advertising', color: '#c9603f' },
+    { key: 'Animation', color: '#8a6bb0' },
+    { key: 'Animatic', color: '#4a938c' }
+  ];
+  var CR_ARRS = ['split', 'gallery', 'feed', 'showcase', 'stream'];
+  var CR_ARR_LBL = { split: 'Split', gallery: 'Gallery', feed: 'Feed', showcase: 'Showcase', stream: 'Stream' };
+  var CR_ICONS = {
+    image: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.6"/><path d="M20 16l-4.5-4.5L8 19"/></svg>',
+    video: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M11 9.2l4 2.8-4 2.8z" fill="currentColor" stroke="none"/></svg>',
+    music: '<svg viewBox="0 0 24 24"><path d="M9 17V5l10-2v11"/><circle cx="6.5" cy="17" r="2.4"/><circle cx="16.5" cy="14" r="2.4"/></svg>',
+    link: '<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.5.5l2-2A5 5 0 0012.5 4.5l-1.2 1.2"/><path d="M14 11a5 5 0 00-7.5-.5l-2 2A5 5 0 0011.5 19.5l1.2-1.2"/></svg>',
+    file: '<svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/></svg>'
+  };
+
+  function crCreditByName(name) {
+    var a = state.credits || [];
+    for (var i = 0; i < a.length; i++) { if (a[i] && a[i].name === name) return a[i]; }
+    return null;
+  }
+  function crFindGroup(key) {
+    var k = String(key || '').toLowerCase();
+    for (var i = 0; i < CR_GROUPS.length; i++) { if (CR_GROUPS[i].key.toLowerCase() === k) return CR_GROUPS[i]; }
+    return null;
+  }
+  function crInGroup(c, key) { return String((c && c.board_group) || '').toLowerCase() === String(key).toLowerCase(); }
+  function crInitials(name) {
+    var parts = String(name || '').trim().split(/\s+/);
+    var s = (parts[0] || '')[0] || '';
+    if (parts[1]) s += (parts[1][0] || '');
+    return s.toUpperCase() || '?';
+  }
+  function crEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function crUploadsFor(name) {
+    return (uploads || []).filter(function (u) { return u.creator === name; })
+      .slice().sort(function (a, b) { return String(b.created_at || '').localeCompare(String(a.created_at || '')); });
+  }
+
+  /* ---- backend calls (creator-config / public-arrangement / upload-for / upload-link) ---- */
+  function crSetGroup(name, key) {
+    api('/api/admin/creator-config', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, board_group: key })
+    }).then(function () {
+      var c = crCreditByName(name); if (c) c.board_group = key;
+      crState.groupMenu = null;
+      toast(key ? ('Moved to ' + key) : 'Group cleared');
+      render();
+    }).catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
+  }
+  function crSetIndividualArr(name, arr) {
+    api('/api/admin/creator-config', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, arrangement: arr })
+    }).then(function () {
+      var c = crCreditByName(name); if (c) c.arrangement = arr;
+      toast('Arrangement: ' + arr);
+      render();
+    }).catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
+  }
+  function crSetPublicArr(arr) {
+    api('/api/admin/public-arrangement', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ arrangement: arr })
+    }).then(function () {
+      crState.publicArr = arr;
+      toast('Public arrangement: ' + arr);
+      render();
+    }).catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
+  }
+  function crFetchPublicArr() {
+    crState.publicFetched = true;
+    api('/api/admin/public-arrangement')
+      .then(function (d) { crState.publicArr = (d && d.arrangement) ? d.arrangement : 'split'; render(); })
+      .catch(function () { /* keep default */ });
+  }
+  function crUploadImage(name, file, btn) {
+    btn.disabled = true; var old = btn.textContent; btn.textContent = 'Uploading…';
+    var title = file.name.replace(/\.[a-z0-9]+$/i, '').slice(0, 100);
+    fetch(API + '/api/admin/upload-for?creator=' + encodeURIComponent(name) + '&title=' + encodeURIComponent(title), {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': file.type }, authHeaders()),
+      body: file
+    }).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || 'upload failed'); return d; }); })
+      .then(function () { toast('Added to ' + name); loadUploads(); })
+      .catch(function (e) { toast(e.message, true); btn.disabled = false; btn.textContent = old; });
+  }
+  function crAddLink(name, url, title, type, btn) {
+    btn.disabled = true;
+    api('/api/admin/upload-link', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ creator: name, title: title, url: url, type: type })
+    }).then(function () { toast('Link added to ' + name); loadUploads(); })
+      .catch(function (e) { if (e.message !== 'login required') toast(e.message, true); btn.disabled = false; });
+  }
+  function crUploadImageToGroup(members, file, btn) {
+    btn.disabled = true; var old = btn.textContent; btn.textContent = 'Uploading…';
+    var title = file.name.replace(/\.[a-z0-9]+$/i, '').slice(0, 100);
+    Promise.all(members.map(function (m) {
+      return fetch(API + '/api/admin/upload-for?creator=' + encodeURIComponent(m.name) + '&title=' + encodeURIComponent(title), {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': file.type }, authHeaders()),
+        body: file
+      }).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || 'upload failed'); return d; }); });
+    })).then(function () { toast('Added to ' + members.length + ' boards'); loadUploads(); })
+      .catch(function (e) { toast(e.message, true); btn.disabled = false; btn.textContent = old; });
+  }
+  function crAddLinkToGroup(members, url, title, type, btn) {
+    btn.disabled = true;
+    Promise.all(members.map(function (m) {
+      return api('/api/admin/upload-link', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creator: m.name, title: title, url: url, type: type })
       });
-      var delB = el('button', 'icon-btn danger', '🗑');
-      delB.title = 'Delete';
-      delB.onclick = function () { if (confirm('Delete this upload forever?')) uploadAction(u.id, '', 'DELETE'); };
-      head.appendChild(delB);
+    })).then(function () { toast('Link added to ' + members.length + ' boards'); loadUploads(); })
+      .catch(function (e) { if (e.message !== 'login required') toast(e.message, true); btn.disabled = false; });
+  }
+
+  /* ---- media-slot tile ---- */
+  function crStatusMark(status) {
+    if (status === 'paid') return ['p', 'paid'];
+    if (status === 'verified') return ['v', 'verified'];
+    if (status === 'seen') return ['v', 'seen'];
+    if (status === 'new') return ['n', 'new'];
+    return null;
+  }
+  function crTile(u) {
+    var d = el('div', 'cr-tile');
+    var mt = u.media_type || 'image';
+    var hasImg = mt === 'image' && u.image;
+    if (hasImg) {
+      d.style.backgroundImage = 'url("' + imgPreviewUrl(u.image).replace(/"/g, '%22') + '")';
+    } else {
+      var ic = el('div', 'cr-ic'); ic.innerHTML = CR_ICONS[mt] || CR_ICONS.file; d.appendChild(ic);
     }
-    card.appendChild(head);
+    d.appendChild(el('div', 'cr-ty', mt));
+    d.appendChild(el('span', '', u.title || '(untitled)'));
+    var mk = crStatusMark(u.status);
+    if (mk) d.appendChild(el('div', 'cr-mk ' + mk[0], mk[1]));
+    return d;
+  }
+  function crFillBox(boxEl, items, arr) {
+    boxEl.className = 'cr-box ' + (CR_ARRS.indexOf(arr) >= 0 ? arr : 'split');
+    if (!items.length) { boxEl.appendChild(el('div', 'cr-emptybox', 'Nothing here yet.')); return; }
+    items.forEach(function (u) { boxEl.appendChild(crTile(u)); });
+  }
+
+  /* ---- drop control: Upload image + Add link ---- */
+  function crDropControl(label, onImage, onLink) {
+    var wrap = el('div', 'cr-drop');
+    wrap.appendChild(el('div', 'cr-dcap', label));
+    var imgBtn = el('button', 'btn primary', 'Upload image'); imgBtn.type = 'button';
+    var file = el('input'); file.type = 'file'; file.accept = 'image/*'; file.style.display = 'none';
+    imgBtn.onclick = function () { file.click(); };
+    file.onchange = function () { var f = file.files[0]; file.value = ''; if (f) onImage(f, imgBtn); };
+    var linkBtn = el('button', 'btn', 'Add link'); linkBtn.type = 'button';
+    var form = el('div', 'cr-linkform'); form.style.display = 'none';
+    var url = el('input'); url.type = 'text'; url.placeholder = 'https://…  (URL)';
+    var title = el('input'); title.type = 'text'; title.placeholder = 'title';
+    var sel = el('select');
+    ['link', 'video', 'music', 'file', 'image'].forEach(function (t) { sel.appendChild(new Option(t, t)); });
+    var addBtn = el('button', 'btn primary', 'Add'); addBtn.type = 'button';
+    addBtn.onclick = function () {
+      var u = url.value.trim();
+      if (!u) { toast('Enter a URL', true); return; }
+      onLink(u, title.value.trim(), sel.value, addBtn);
+    };
+    linkBtn.onclick = function () { form.style.display = form.style.display === 'none' ? '' : 'none'; };
+    form.appendChild(url); form.appendChild(title); form.appendChild(sel); form.appendChild(addBtn);
+    wrap.appendChild(imgBtn); wrap.appendChild(linkBtn); wrap.appendChild(file); wrap.appendChild(form);
+    return wrap;
+  }
+
+  /* ---- top cards row ---- */
+  function crCardEl(c) {
+    var card = el('div', 'cr-pcard' + (crState.person === c.name ? ' on' : ''));
+    var g = crFindGroup(c.board_group);
+    var color = g ? g.color : '#7a2a3c';
+    var row1 = el('div', 'cr-row1');
+    var av = el('div', 'cr-av');
+    var photo = c.photo ? imgPreviewUrl(c.photo) : '';
+    if (photo) { av.style.backgroundImage = 'url("' + photo.replace(/"/g, '%22') + '")'; }
+    else { av.textContent = crInitials(c.name); av.style.background = color; }
+    row1.appendChild(av);
+    var meta = el('div');
+    meta.appendChild(el('div', 'cr-nm', c.name));
+    if (c.roles) meta.appendChild(el('div', 'cr-rl', c.roles));
+    row1.appendChild(meta);
+    card.appendChild(row1);
+
+    var ups = crUploadsFor(c.name).slice(0, 3);
+    var thumbs = el('div', 'cr-thumbs');
+    for (var i = 0; i < 3; i++) {
+      var t = el('i');
+      var u = ups[i];
+      if (u && u.media_type === 'image' && u.image) { t.style.backgroundImage = 'url("' + imgPreviewUrl(u.image).replace(/"/g, '%22') + '")'; }
+      thumbs.appendChild(t);
+    }
+    card.appendChild(thumbs);
+
+    var tag = el('div', 'cr-gtag');
+    var dot = el('span', 'cr-gdot'); dot.style.background = color; tag.appendChild(dot);
+    tag.appendChild(document.createTextNode(g ? g.key : 'No group'));
+    tag.appendChild(el('span', 'cr-chev', '▾'));
+    tag.onclick = function (e) { e.stopPropagation(); crState.groupMenu = (crState.groupMenu === c.name ? null : c.name); render(); };
+    card.appendChild(tag);
+
+    if (crState.groupMenu === c.name) {
+      var menu = el('div', 'cr-gmenu');
+      CR_GROUPS.forEach(function (gr) {
+        var b = el('button', '', gr.key); b.type = 'button';
+        b.onclick = function (e) { e.stopPropagation(); crSetGroup(c.name, gr.key); };
+        menu.appendChild(b);
+      });
+      var none = el('button', 'cr-gmenu-none', 'No group'); none.type = 'button';
+      none.onclick = function (e) { e.stopPropagation(); crSetGroup(c.name, ''); };
+      menu.appendChild(none);
+      card.appendChild(menu);
+    }
+
+    card.onclick = function () { crState.person = c.name; crState.group = null; crState.groupMenu = null; render(); };
     return card;
+  }
+
+  /* ---- left: Groups panel ---- */
+  function crGroupsCol(creds) {
+    var col = el('div', 'cr-col');
+    var pc = el('div', 'cr-panelcard');
+    pc.appendChild(el('div', 'cr-colh', 'Groups'));
+    var glist = el('div', 'cr-glist');
+    CR_GROUPS.forEach(function (g) {
+      var count = creds.filter(function (c) { return crInGroup(c, g.key); }).length;
+      var b = el('button', 'cr-gbtn' + (crState.group === g.key ? ' on' : '')); b.type = 'button';
+      var dot = el('span', 'cr-gdot'); dot.style.background = g.color; b.appendChild(dot);
+      b.appendChild(document.createTextNode(g.key));
+      b.appendChild(el('span', 'cr-gc', String(count)));
+      b.onclick = function () { crState.group = g.key; crState.person = null; crState.groupMenu = null; render(); };
+      glist.appendChild(b);
+    });
+    pc.appendChild(glist);
+    var none = el('div', 'cr-gnone', '✕ No group · edit individuals');
+    none.onclick = function () { crState.group = null; crState.person = null; render(); };
+    pc.appendChild(none);
+    col.appendChild(pc);
+    return col;
+  }
+
+  /* ---- middle: the board ---- */
+  function crBoardCol(creds) {
+    var col = el('div', 'cr-col');
+    var stage = el('div', 'cr-stage');
+    var bar = el('div', 'cr-stagebar');
+    var crumb = el('span', 'cr-crumb');
+    var mode = el('span', 'cr-mode');
+    bar.appendChild(crumb); bar.appendChild(mode);
+    stage.appendChild(bar);
+    var inner = el('div', 'cr-stageinner');
+    stage.appendChild(inner);
+
+    if (crState.person && !crCreditByName(crState.person)) crState.person = null;
+
+    if (crState.person) {
+      var c = crCreditByName(crState.person);
+      crumb.innerHTML = 'Editing <b>' + crEsc(c.name) + '</b>';
+      mode.textContent = 'Individual'; mode.className = 'cr-mode';
+      var wrap = el('div', 'cr-ssplit');
+      var L = el('div', 'cr-sside');
+      var ll = el('p', 'cr-slabel'); ll.appendChild(el('span', 'p', 'Their board')); L.appendChild(ll);
+      var lbox = el('div');
+      crFillBox(lbox, crUploadsFor(c.name), c.arrangement || 'split');
+      L.appendChild(lbox);
+      L.appendChild(crDropControl(c.name.split(' ')[0] + "’s content",
+        function (f, btn) { crUploadImage(c.name, f, btn); },
+        function (u, t, ty, btn) { crAddLink(c.name, u, t, ty, btn); }));
+      var D = el('div', 'cr-sdiv');
+      var R = el('div', 'cr-sside');
+      var rl = el('p', 'cr-slabel'); rl.appendChild(el('span', 'g', 'Public · everyone sees this')); R.appendChild(rl);
+      var rbox = el('div');
+      crFillBox(rbox, crUploadsFor('shared'), crState.publicArr || 'split');
+      R.appendChild(rbox);
+      R.appendChild(el('div', 'cr-readonly', 'Read-only here · the same public board everyone sees.'));
+      wrap.appendChild(L); wrap.appendChild(D); wrap.appendChild(R);
+      inner.appendChild(wrap);
+    } else if (crState.group) {
+      var g = crFindGroup(crState.group);
+      var gname = g ? g.key : crState.group;
+      var members = creds.filter(function (x) { return crInGroup(x, crState.group); });
+      crumb.innerHTML = 'Editing group <b>' + crEsc(gname) + '</b>';
+      mode.textContent = 'Group · adds to each member'; mode.className = 'cr-mode grp';
+      var single = el('div', 'cr-ssplit single');
+      var S = el('div', 'cr-sside');
+      var sl = el('p', 'cr-slabel'); sl.appendChild(el('span', 'g', gname + ' — ' + members.length + ' members')); S.appendChild(sl);
+      S.appendChild(el('p', 'cr-note', "Drop a piece here and it lands on every member’s individual board at once."));
+      if (!members.length) {
+        S.appendChild(el('div', 'cr-emptybox', 'No members yet — assign creators via the tag on their card.'));
+      } else {
+        S.appendChild(crDropControl('drop into all ' + members.length + ' ' + gname + ' boards',
+          function (f, btn) { crUploadImageToGroup(members, f, btn); },
+          function (u, t, ty, btn) { crAddLinkToGroup(members, u, t, ty, btn); }));
+        var chips = el('div', 'cr-chips');
+        members.forEach(function (m) {
+          var mg = crFindGroup(m.board_group);
+          var chip = el('span', 'cr-chip');
+          var ci = el('span', 'cr-chipav'); ci.style.background = mg ? mg.color : '#7a2a3c'; ci.textContent = crInitials(m.name);
+          chip.appendChild(ci);
+          chip.appendChild(document.createTextNode(m.name + ' · ' + crUploadsFor(m.name).length));
+          chips.appendChild(chip);
+        });
+        S.appendChild(chips);
+      }
+      single.appendChild(S);
+      inner.appendChild(single);
+    } else {
+      crumb.textContent = 'Select a card'; mode.style.display = 'none';
+      inner.appendChild(el('div', 'cr-empty', "Pick a person’s card above to edit their split board — or a group on the left to drop content for everyone in it."));
+    }
+    col.appendChild(stage);
+    return col;
+  }
+
+  /* ---- right: vertical Arrangement rail ---- */
+  function crRailCol() {
+    var col = el('div', 'cr-col');
+    col.appendChild(el('div', 'cr-colh', 'Arrangement'));
+    var rail = el('div', 'cr-rail');
+    var active = null, mode = null;
+    if (crState.person) { var c = crCreditByName(crState.person); active = (c && c.arrangement) || 'split'; mode = 'ind'; }
+    else if (crState.group) { active = crState.publicArr || 'split'; mode = 'grp'; }
+    CR_ARRS.forEach(function (a) {
+      var b = el('div', 'cr-arrbtn' + (a === active ? ' on' : ''));
+      var t = el('div', 'cr-athumb cr-t-' + a);
+      var n = (a === 'gallery' || a === 'showcase') ? 6 : (a === 'stream' ? 3 : 2);
+      for (var i = 0; i < n; i++) t.appendChild(el('i'));
+      b.appendChild(t);
+      b.appendChild(el('div', 'cr-anm', CR_ARR_LBL[a]));
+      b.onclick = function () {
+        if (mode === 'ind') crSetIndividualArr(crState.person, a);
+        else if (mode === 'grp') crSetPublicArr(a);
+        else toast('Select a card or group first', true);
+      };
+      rail.appendChild(b);
+    });
+    col.appendChild(rail);
+    col.appendChild(el('p', 'cr-railcap', mode === 'grp' ? 'Sets the public board layout.' : 'Sets how the active board lays out.'));
+    return col;
   }
 
   function renderCreators() {
     if (uploads === null) {
-      listEl.appendChild(el('div', 'empty', 'Loading the crew dashboard…'));
+      listEl.appendChild(el('div', 'cr-empty', 'Loading the board editor…'));
       return;
     }
-    var split = el('div');
-    split.style.display = 'grid';
-    split.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
-    split.style.gap = '1.2rem';
-    split.style.alignItems = 'start';
+    if (!crState.publicFetched) crFetchPublicArr();
 
-    /* ---- LEFT: one creator ---- */
-    var left = el('div');
-    left.appendChild(el('div', 'col-label', 'Upload to a creator'));
-    var names = state.credits.map(function (c) { return c.name; }).filter(Boolean);
-    if (!pickedCreator && names.length) pickedCreator = names[0];
-    var sel = el('select');
-    names.forEach(function (n) { sel.appendChild(new Option(n, n)); });
-    sel.value = pickedCreator;
-    sel.onchange = function () { pickedCreator = sel.value; render(); };
-    left.appendChild(sel);
+    var root = el('div', 'cr-editor');
+    var top = el('div', 'cr-top');
+    top.appendChild(el('div', 'cr-eyebrow', 'Madam Studio · Creators'));
+    top.appendChild(el('div', 'cr-h1b', 'Board Editor'));
+    top.appendChild(el('div', 'cr-sub', "Everyone’s cards up top. Click a card to edit that person’s split board; click a group to drop into the whole group."));
+    root.appendChild(top);
 
-    var drop = el('div', 'item');
-    var file = el('input'); file.type = 'file'; file.accept = 'image/png,image/jpeg,image/gif,image/webp';
-    var upBtn = el('button', 'btn primary', 'Choose image → upload to ' + (pickedCreator || 'creator'));
-    upBtn.style.width = '100%';
-    upBtn.onclick = function () { file.click(); };
-    file.onchange = function () {
-      var f = file.files[0]; file.value = '';
-      if (!f || !pickedCreator) return;
-      upBtn.disabled = true; upBtn.textContent = 'Uploading…';
-      var title = f.name.replace(/\.[a-z0-9]+$/i, '').slice(0, 100);
-      fetch(API + '/api/admin/upload-for?creator=' + encodeURIComponent(pickedCreator) + '&title=' + encodeURIComponent(title), {
-        method: 'POST',
-        headers: Object.assign({ 'Content-Type': f.type }, authHeaders()),
-        body: f,
-      }).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || 'upload failed'); return d; }); })
-        .then(function () { toast('Added to ' + pickedCreator); uploads = null; loadUploads(); })
-        .catch(function (e) { toast(e.message, true); upBtn.disabled = false; upBtn.textContent = 'Choose image → upload'; });
-    };
-    drop.appendChild(upBtn);
-    drop.appendChild(file);
-    left.appendChild(drop);
+    var creds = (state.credits || []).filter(function (c) { return c && c.name; });
+    var visible = crState.group ? creds.filter(function (c) { return crInGroup(c, crState.group); }) : creds;
+    var cardrow = el('div', 'cr-cardrow');
+    if (!visible.length) {
+      cardrow.appendChild(el('div', 'cr-empty', crState.group ? 'No creators in this group yet.' : 'No creators yet — add them on the site first.'));
+    }
+    visible.forEach(function (c) { cardrow.appendChild(crCardEl(c)); });
+    root.appendChild(cardrow);
 
-    var mine = uploads.filter(function (u) { return u.creator === pickedCreator; });
-    left.appendChild(el('div', 'col-label', (pickedCreator || 'Creator') + "'s work · " + mine.length));
-    if (!mine.length) left.appendChild(el('div', 'empty', 'Nothing yet — drop the first piece above.'));
-    mine.forEach(function (u) { left.appendChild(uploadCardEl(u, true)); });
+    var work = el('div', 'cr-work');
+    work.appendChild(crGroupsCol(creds));
+    work.appendChild(crBoardCol(creds));
+    work.appendChild(crRailCol());
+    root.appendChild(work);
 
-    /* ---- RIGHT: shared crew feed ---- */
-    var right = el('div');
-    right.appendChild(el('div', 'col-label', 'Crew activity — everyone'));
-    if (!uploads.length) right.appendChild(el('div', 'empty', 'No work uploaded yet.'));
-    uploads.slice(0, 40).forEach(function (u) { right.appendChild(uploadCardEl(u, false)); });
-
-    split.appendChild(left);
-    split.appendChild(right);
-    listEl.appendChild(split);
+    listEl.appendChild(root);
   }
 
   /* ---- payments ---- */
