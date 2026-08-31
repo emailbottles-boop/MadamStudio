@@ -7,14 +7,14 @@
 <meta name="description" content="A Madam Studio creator's page: their work, uploads, and projects.">
 <link rel="icon" type="image/png" href="/img/favicon.png">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap');
 
-  /* Flat light-blue theme — matches index.html, no gradients. */
   :root{
-    --bg:#4a1020; --panel:#611829; --panel-2:#742138; --border:#8d3a4e;
+    --bg:#4a1020; --panel:#611829; --panel-2:#742138; --border:#8d3a4e; --border-soft:#6e2739;
     --text:#f7ecd9; --text-2:#e7cfa4; --muted:#cf9bad;
     --accent:#f3c53f; --accent-deep:#d99a1f; --accent-ink:#3a1020;
     --verified:#6fe0a0; --paid:#f3c53f;
+    --disp:'Fraunces',Georgia,serif; --body:'Source Serif 4',Georgia,serif;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,8 +22,9 @@
 
   body {
     background: var(--bg);
+    background-image: radial-gradient(130% 90% at 50% -20%, #571830 0%, var(--bg) 55%);
     color: var(--text);
-    font-family: 'Source Serif 4', Georgia, serif;
+    font-family: var(--body);
     min-height: 100vh;
   }
 
@@ -32,7 +33,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-family: 'Source Serif 4', Georgia, serif;
+    font-family: var(--body);
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.08em;
@@ -49,118 +50,83 @@
   .studio-btn:hover { border-color: var(--accent); background: var(--panel-2); }
   .studio-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  .wrap { max-width: 1140px; margin: 0 auto; padding: 100px 24px 80px; }
-
-  /* ── creator header ──────────────────────────────── */
-  .who { display: flex; align-items: center; gap: 18px; margin-bottom: 30px; flex-wrap: wrap; }
+  /* ── header band ──────────────────────────────── */
+  .band { position: relative; overflow: hidden; padding: 78px 30px 26px; border-bottom: 1px solid var(--border-soft); }
+  .ghost {
+    position: absolute; top: 34px; left: -6px;
+    font-family: var(--disp); font-weight: 900; font-size: 150px; line-height: .8;
+    color: #ffffff; opacity: .045; letter-spacing: -.03em;
+    pointer-events: none; white-space: nowrap; z-index: 0;
+  }
+  .band .inner {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px;
+  }
+  .who { display: flex; align-items: center; gap: 16px; }
   .who-photo {
-    width: 92px; height: 92px;
-    border-radius: 50%;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    font-weight: 700;
-    color: var(--accent);
+    width: 60px; height: 60px; border-radius: 50%;
+    background: var(--panel); border: 1px solid var(--border);
+    overflow: hidden; display: flex; align-items: center; justify-content: center;
+    font-family: var(--disp); font-size: 22px; font-weight: 700; color: var(--accent);
     flex-shrink: 0;
   }
   .who-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .who h1 { font-family: 'Fraunces', Georgia, serif; font-size: clamp(24px, 4.5vw, 36px); font-weight: 700; letter-spacing: -0.02em; color: var(--accent-deep); }
-  .who .roles { font-size: 13px; color: var(--muted); white-space: pre-line; line-height: 1.5; margin-top: 4px; }
-  .who .id-badge {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--verified);
-    border: 1px solid var(--verified);
-    border-radius: 3px;
-    padding: 3px 8px;
+  .who .eyebrow { font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin: 0 0 6px; }
+  .who h1 { font-family: var(--disp); font-weight: 700; font-size: clamp(30px, 5vw, 46px); margin: 0; line-height: 1; letter-spacing: -.01em; color: var(--text); }
+  .who .roles { color: var(--text-2); font-size: 13px; margin-top: 8px; white-space: pre-line; line-height: 1.5; }
+
+  .pay { display: flex; gap: 30px; justify-content: center; }
+  .pay .stat { text-align: center; }
+  .pay .lbl { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .pay .num { font-family: var(--disp); font-weight: 600; font-size: 30px; color: #ffffff; line-height: 1; font-variant-numeric: tabular-nums; }
+
+  .badge {
+    justify-self: end;
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--verified);
+    border: 1px solid #3f6e52; border-radius: 999px; padding: 6px 12px;
   }
 
-  /* ── two halves: your work / shared with the crew ─── */
-  .split {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: start;
-  }
+  /* ── split board ──────────────────────────────── */
+  .split { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 0; align-items: start; }
+  .divider { background: var(--border-soft); align-self: stretch; }
+  .side { padding: 24px 26px 60px; }
+  .side.left { background: linear-gradient(180deg, #450f20, transparent 60%); }
 
-  .col-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
-  .col-label {
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
+  .colhead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
+  .colhead .lab { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .colhead .meta { font-size: 11.5px; color: var(--muted); margin-left: auto; }
 
-  .panel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
-  .side .panel-grid, .mid .panel-grid { grid-template-columns: 1fr; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid.pub { grid-template-columns: 1fr 1fr 1fr; }
+  .grid .empty-note { grid-column: 1 / -1; }
 
-  .sq {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-    display: block;
-    text-decoration: none;
-    color: inherit;
+  .tile {
+    border-radius: 9px; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    min-height: 96px; background: #380e1b; border: 1px solid var(--border-soft);
+    text-decoration: none; color: inherit;
     transition: border-color 0.15s, transform 0.15s;
   }
-  a.sq:hover { border-color: var(--accent); transform: translateY(-2px); }
-  a.sq:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .sq img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .sq .cap {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    background: rgba(255, 255, 255, 0.94);
-    border-top: 1px solid var(--border);
-    padding: 9px 12px;
-    font-size: 13px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .sq .cap .ext { color: var(--accent); font-size: 12px; }
-  .sq.no-img { display: flex; align-items: center; justify-content: center; padding: 18px; text-align: center; }
-  .sq.no-img .cap { position: static; background: none; border: none; padding: 0; font-size: 15px; justify-content: center; }
+  a.tile:hover { border-color: var(--accent); transform: translateY(-2px); }
+  a.tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tile img { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; inset: 0; }
+  .tile .ic { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); opacity: .5; }
+  .tile .ic svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .tile .ty { position: absolute; top: 8px; left: 9px; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); z-index: 1; font-style: normal; }
+  .tile span { font-size: 12px; color: var(--text-2); padding: 9px 10px; z-index: 1; font-weight: 500; position: relative; background: linear-gradient(transparent, rgba(0,0,0,.4)); }
+  .tile .mk { position: absolute; top: 7px; right: 7px; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; background: rgba(0,0,0,.4); border-radius: 999px; padding: 2px 8px; z-index: 1; font-style: normal; }
+  .mk.v { color: var(--verified); } .mk.p { color: var(--accent); } .mk.n { color: #fff; }
 
-  .side .sq { aspect-ratio: auto; }
-  .side .sq img { aspect-ratio: 16 / 10; }
+  /* uploads / paid detail / states */
+  .up-msg { font-size: 12px; margin: 8px 0 0; display: none; }
+  .up-msg.err { color: #b3323c; display: block; }
+  .up-msg.ok { color: var(--verified); display: block; }
 
-  /* uploads (middle) */
-  .up-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  .up-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
-  .up-meta { padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
-  .up-title { font-size: 13px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .mark {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    border: 1px solid currentColor;
-    border-radius: 3px;
-    padding: 3px 7px;
-    flex-shrink: 0;
-  }
-  .mark.new      { color: var(--muted); }
-  .mark.seen     { color: var(--accent); }
-  .mark.verified { color: var(--verified); }
-  .mark.paid     { color: var(--paid); }
+  #paidWrap { margin: 4px 0 16px; }
+  #paidList .up-title { font-family: var(--disp); font-weight: 600; }
 
   .btn {
-    font-family: 'Source Serif 4', Georgia, serif;
+    font-family: var(--body);
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.08em;
@@ -171,14 +137,14 @@
     border: 1px solid var(--accent);
     background: var(--accent);
     color: var(--accent-ink);
+    text-decoration: none;
+    display: inline-block;
     transition: background 0.15s, border-color 0.15s;
   }
   .btn:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
   .btn:disabled { opacity: 0.6; cursor: wait; }
 
-  .up-msg { font-size: 12px; margin: 8px 0 0; display: none; }
-  .up-msg.err { color: #b3323c; display: block; }
-  .up-msg.ok { color: var(--verified); display: block; }
+  .up-title { font-size: 13px; font-weight: 600; }
 
   .empty-note {
     font-size: 13px;
@@ -193,21 +159,25 @@
   footer {
     text-align: center;
     padding: 26px 20px 34px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--border-soft);
     font-size: 12px;
     color: var(--muted);
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 760px) {
+    .band .inner { grid-template-columns: 1fr; }
+    .pay { justify-content: flex-start; }
+    .badge { justify-self: start; }
+    .ghost { font-size: 84px; }
     .split { grid-template-columns: 1fr; }
-    .mid, .side { border-top: 1px solid var(--border); padding-top: 24px; }
-    .panel-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-    .mid .panel-grid, .side .panel-grid { grid-template-columns: 1fr; }
+    .divider { display: none; }
+    .side.left { border-bottom: 1px solid var(--border-soft); }
+    .grid.pub { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 480px) {
     .corner-nav { top: 16px; right: 16px; }
     .studio-btn { font-size: 11px; padding: 9px 13px; }
-    .wrap { padding-top: 88px; }
+    .grid, .grid.pub { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
@@ -218,47 +188,60 @@
     <a class="studio-btn" href="/">Madam Studio</a>
   </nav>
 
-  <div class="wrap">
-    <header class="who">
-      <div class="who-photo" id="whoPhoto"></div>
-      <div>
-        <h1 id="whoName">&hellip;</h1>
-        <div class="roles" id="whoRoles"></div>
-        <span class="id-badge" id="whoBadge" style="display:none">✓ Verified</span>
+  <div class="band">
+    <div class="ghost" id="nameGhost"></div>
+    <div class="inner">
+      <header class="who">
+        <div class="who-photo" id="whoPhoto"></div>
+        <div class="who-body">
+          <p class="eyebrow">Madam Studio · Wizard Crew</p>
+          <h1 id="whoName">&hellip;</h1>
+          <div class="roles" id="whoRoles"></div>
+        </div>
+      </header>
+      <div class="pay" id="payWrap" hidden>
+        <div class="stat">
+          <div class="lbl">Paid to date</div>
+          <div class="num" id="payTotal">$0</div>
+        </div>
       </div>
-    </header>
-
-    <div id="crewWall" class="empty-note" style="display:none;max-width:520px;margin:10px auto 60px">
-      This is the Madam Studio crew work portal. If you work here, claim your card on your account to request access — a producer verifies it, then the work opens.
-      <div style="margin-top:14px"><a class="btn primary" href="/account/" style="text-decoration:none">Claim your card</a></div>
+      <span class="badge" id="whoBadge" style="display:none">✓ Verified crew</span>
     </div>
-    <div class="split" id="workArea">
-      <!-- LEFT HALF: your own work — what the admins assigned to you, plus what you upload -->
-      <section aria-label="Your work">
-        <div class="col-head">
-          <span class="col-label">Your work</span>
-          <span style="flex:1"></span>
-          <button class="btn" id="uploadBtn" style="display:none">Upload</button>
-          <a class="btn" id="hubSignin" href="/account/" style="display:none">Sign in to upload</a>
-          <input type="file" id="uploadFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none">
-        </div>
-        <p class="up-msg" id="uploadMsg"></p>
-        <div id="paidWrap" hidden>
-          <div class="col-head" style="margin-top:4px"><span class="col-label">Paid to you</span></div>
-          <div id="paidList"></div>
-        </div>
-        <div class="panel-grid" id="uploadGrid" style="margin-top:10px"></div>
-        <div class="panel-grid" id="mineGrid" style="margin-top:14px"></div>
-      </section>
+  </div>
 
-      <!-- RIGHT HALF: what the admins share with the whole crew -->
-      <aside class="side" aria-label="Shared with the crew">
-        <div class="col-head"><span class="col-label">Shared with the crew</span></div>
-        <div class="panel-grid" id="sharedGrid"></div>
-        <div class="col-head" style="margin-top:26px"><span class="col-label">New from the crew</span></div>
-        <div class="panel-grid" id="crewGrid"></div>
-      </aside>
-    </div>
+  <div id="crewWall" class="empty-note" style="display:none;max-width:520px;margin:24px auto 40px">
+    This is the Madam Studio crew work portal. If you work here, claim your card on your account to request access — a producer verifies it, then the work opens.
+    <div style="margin-top:14px"><a class="btn primary" href="/account/">Claim your card</a></div>
+  </div>
+
+  <div class="split" id="workArea">
+    <!-- LEFT HALF: your own work — what the admins assigned to you, plus what you upload -->
+    <section class="side left" aria-label="Your board">
+      <div class="colhead">
+        <span class="lab">Your board</span>
+        <span style="flex:1"></span>
+        <button class="btn" id="uploadBtn" style="display:none">Upload</button>
+        <a class="btn" id="hubSignin" href="/account/" style="display:none">Sign in to upload</a>
+        <input type="file" id="uploadFile" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none">
+      </div>
+      <p class="up-msg" id="uploadMsg"></p>
+      <div id="paidWrap" hidden>
+        <div class="colhead" style="margin-top:4px"><span class="lab">Paid to you</span></div>
+        <div id="paidList"></div>
+      </div>
+      <div class="grid" id="uploadGrid"></div>
+      <div class="grid" id="mineGrid" style="margin-top:14px"></div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- RIGHT HALF: what the admins share with the whole crew -->
+    <aside class="side right" aria-label="Shared with the crew">
+      <div class="colhead"><span class="lab">Wizard Shit · shared</span><span class="meta">everyone sees this</span></div>
+      <div class="grid pub" id="sharedGrid"></div>
+      <div class="colhead" style="margin-top:26px"><span class="lab">New from the crew</span></div>
+      <div class="grid pub" id="crewGrid"></div>
+    </aside>
   </div>
 
   <footer>
@@ -285,6 +268,15 @@ const uploadBtn = document.getElementById("uploadBtn");
 const uploadFile = document.getElementById("uploadFile");
 const uploadMsg = document.getElementById("uploadMsg");
 
+// Blank media-slot icons, keyed by media type.
+const ICONS = {
+  image:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.6"/><path d="M20 16l-4.5-4.5L8 19"/></svg>',
+  video:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M11 9.2l4 2.8-4 2.8z" fill="currentColor" stroke="none"/></svg>',
+  music:'<svg viewBox="0 0 24 24"><path d="M9 17V5l10-2v11"/><circle cx="6.5" cy="17" r="2.4"/><circle cx="16.5" cy="14" r="2.4"/></svg>',
+  link:'<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.5.5l2-2A5 5 0 0012.5 4.5l-1.2 1.2"/><path d="M14 11a5 5 0 00-7.5-.5l-2 2A5 5 0 0011.5 19.5l1.2-1.2"/></svg>',
+  file:'<svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/></svg>'
+};
+
 // Member session token (set on account.html). Upload is gated on it server-side.
 function acctToken(){ try { return localStorage.getItem("wizAcct") || ""; } catch(_) { return ""; } }
 
@@ -295,56 +287,65 @@ function imgUrl(path) {
   return /^https?:\/\//i.test(path) ? path : API + "/" + path.replace(/^\/+/, "");
 }
 
-function panelEl(p) {
-  const hasLink = /^https?:\/\//i.test(p.url || "");
+// Build a blank media-slot tile: an image when there is one, otherwise a
+// type icon; small type label top-left, title along the bottom, optional mark.
+function tileEl(opts) {
+  const hasLink = /^https?:\/\//i.test(opts.url || "");
   const node = document.createElement(hasLink ? "a" : "div");
-  node.className = "sq" + (p.image ? "" : " no-img");
-  if (hasLink) { node.href = p.url; node.target = "_blank"; node.rel = "noopener"; }
-  if (p.image) {
+  node.className = "tile";
+  if (hasLink) { node.href = opts.url; node.target = "_blank"; node.rel = "noopener"; }
+  const type = opts.type || (hasLink ? "link" : (opts.image ? "image" : "file"));
+  if (opts.image) {
     const img = document.createElement("img");
     img.loading = "lazy";
     img.decoding = "async";
-    img.alt = p.title || "";
-    img.src = imgUrl(p.image);
+    img.alt = opts.title || "";
+    img.src = imgUrl(opts.image);
     node.appendChild(img);
+  } else {
+    const ic = document.createElement("div");
+    ic.className = "ic";
+    ic.innerHTML = ICONS[type] || ICONS.file;
+    node.appendChild(ic);
   }
-  if (p.title || !p.image) {
-    const cap = document.createElement("div");
-    cap.className = "cap";
-    cap.textContent = p.title || "";
-    if (hasLink) {
-      const ext = document.createElement("span");
-      ext.className = "ext";
-      ext.textContent = "↗";
-      cap.appendChild(ext);
-    }
-    node.appendChild(cap);
+  const ty = document.createElement("i");
+  ty.className = "ty";
+  ty.textContent = type;
+  node.appendChild(ty);
+  if (opts.title) {
+    const s = document.createElement("span");
+    s.textContent = opts.title;
+    node.appendChild(s);
+  }
+  if (opts.mark) {
+    const mk = document.createElement("i");
+    mk.className = "mk " + opts.mark.cls;
+    mk.textContent = opts.mark.text;
+    node.appendChild(mk);
   }
   return node;
 }
 
+function panelEl(p) {
+  const hasLink = /^https?:\/\//i.test(p.url || "");
+  return tileEl({
+    url: hasLink ? p.url : "",
+    image: p.image,
+    title: p.title || "",
+    type: hasLink ? "link" : (p.image ? "image" : "file"),
+  });
+}
+
 function uploadEl(u, showCreator) {
-  const card = document.createElement("div");
-  card.className = "up-card";
-  const img = document.createElement("img");
-  img.loading = "lazy";
-  img.decoding = "async";
-  img.alt = u.title || "";
-  img.src = imgUrl(u.image);
-  card.appendChild(img);
-  const meta = document.createElement("div");
-  meta.className = "up-meta";
-  const t = document.createElement("span");
-  t.className = "up-title";
   const label = u.title || (u.created_at || "").slice(0, 10);
-  t.textContent = showCreator ? u.creator + " — " + label : label;
-  meta.appendChild(t);
-  const mark = document.createElement("span");
-  mark.className = "mark " + (u.status || "new");
-  mark.textContent = u.status || "new";
-  meta.appendChild(mark);
-  card.appendChild(meta);
-  return card;
+  const status = u.status || "new";
+  const cls = status === "verified" ? "v" : (status === "paid" ? "p" : (status === "seen" ? "p" : "n"));
+  return tileEl({
+    image: u.image,
+    title: showCreator ? u.creator + " — " + label : label,
+    type: "image",
+    mark: { cls: cls, text: status },
+  });
 }
 
 function fillGrid(grid, items, make, emptyText) {
@@ -414,6 +415,8 @@ uploadFile.addEventListener("change", async () => {
   document.title = NAME + " — Madam Studio";
   whoName.textContent = NAME;
   whoPhoto.textContent = initials(NAME);
+  const gh = document.getElementById("nameGhost");
+  if (gh) gh.textContent = (NAME.split(/\s+/).pop() || NAME).toUpperCase();
 
   // Public header only: name / role / photo / verified badge. These come from
   // the public credits + claims-public — the WORK below is gated.
@@ -475,6 +478,10 @@ uploadFile.addEventListener("change", async () => {
         const mine = (me.payments || []).filter(p => p.creator === NAME);
         if (mine.length) {
           const total = mine.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+          const pt = document.getElementById("payTotal");
+          if (pt) pt.textContent = "$" + Math.round(total).toLocaleString("en-US");
+          const pw = document.getElementById("payWrap");
+          if (pw) pw.hidden = false;
           const list = document.getElementById("paidList");
           list.innerHTML = "";
           const tot = document.createElement("div");
