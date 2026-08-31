@@ -717,7 +717,6 @@
       var delB = el('button', 'icon-btn danger', '🗑');
       delB.title = 'Delete';
       delB.onclick = function () {
-        if (!confirm('Delete this claim forever?')) return;
         claimAction(c.id, '', 'DELETE');
       };
       head.appendChild(delB);
