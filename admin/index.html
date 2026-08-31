@@ -296,11 +296,11 @@
   .cr-box { display: grid; gap: 8px; }
   .cr-box.split { grid-template-columns: 1fr 1fr; }
   .cr-box.gallery { grid-template-columns: 1fr 1fr; }
-  .cr-box.gallery .cr-tile:first-child { grid-column: 1 / 3; min-height: 88px; }
+  .cr-box.gallery .cr-tile:first-child:not(.cr-add) { grid-column: 1 / 3; min-height: 88px; }
   .cr-box.feed { grid-template-columns: 1fr; }
   .cr-box.feed .cr-tile { min-height: 82px; }
   .cr-box.showcase { grid-template-columns: 1fr 1fr; }
-  .cr-box.showcase .cr-tile:first-child { grid-column: 1 / 3; min-height: 100px; }
+  .cr-box.showcase .cr-tile:first-child:not(.cr-add) { grid-column: 1 / 3; min-height: 100px; }
   .cr-box.stream { grid-template-columns: 1fr; }
   .cr-box.stream .cr-tile { min-height: 42px; }
   .cr-emptybox { grid-column: 1 / -1; text-align: center; color: var(--muted); font-size: 11px; padding: 22px 8px; border: 1px dashed var(--cr-border-soft); border-radius: 7px; }
@@ -897,25 +897,25 @@
       render();
     }).catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
   }
+  function crArrSaveErr(e) {
+    if (e.message === 'login required') return;
+    toast(/not found/i.test(e.message) ? 'Layout preview only — deploy the Worker to save it.' : e.message, true);
+  }
   function crSetIndividualArr(name, arr) {
+    var c = crCreditByName(name); if (c) c.arrangement = arr;
+    render(); // show the new layout immediately
     api('/api/admin/creator-config', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name, arrangement: arr })
-    }).then(function () {
-      var c = crCreditByName(name); if (c) c.arrangement = arr;
-      toast('Arrangement: ' + arr);
-      render();
-    }).catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
+    }).catch(crArrSaveErr);
   }
   function crSetPublicArr(arr) {
+    crState.publicArr = arr;
+    render(); // show the new layout immediately
     api('/api/admin/public-arrangement', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ arrangement: arr })
-    }).then(function () {
-      crState.publicArr = arr;
-      toast('Public arrangement: ' + arr);
-      render();
-    }).catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
+    }).catch(crArrSaveErr);
   }
   function crFetchPublicArr() {
     crState.publicFetched = true;
@@ -1020,10 +1020,18 @@
     return slot;
   }
   function crFillBox(boxEl, items, arr, handlers) {
-    boxEl.className = 'cr-box ' + (CR_ARRS.indexOf(arr) >= 0 ? arr : 'split');
+    var a = CR_ARRS.indexOf(arr) >= 0 ? arr : 'split';
+    boxEl.className = 'cr-box ' + a;
     if (!items.length && !handlers) { boxEl.appendChild(el('div', 'cr-emptybox', 'Nothing here yet.')); return; }
     items.forEach(function (u) { boxEl.appendChild(crTile(u)); });
-    if (handlers) boxEl.appendChild(crAddSlot(handlers));
+    if (handlers) {
+      // Fill out the current row (and give an empty board a full row) with blank
+      // "＋ add" slots, so a Split/Gallery/Showcase board shows two across.
+      var cols = (a === 'feed' || a === 'stream') ? 1 : 2;
+      var rem = items.length % cols;
+      var need = rem === 0 ? cols : cols - rem;
+      for (var i = 0; i < need; i++) boxEl.appendChild(crAddSlot(handlers));
+    }
   }
 
   /* ---- drop control: Upload image + Add link ---- */
