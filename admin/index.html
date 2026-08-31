@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Madam Studio — Control Room</title>
+<style>
+  :root {
+    --bg: #100b1d;
+    --card: #191327;
+    --card2: #201936;
+    --border: rgba(255,255,255,0.09);
+    --border-strong: rgba(255,255,255,0.16);
+    --text: #ece9f1;
+    --muted: #9b94ad;
+    --accent: #f5b301;
+    --accent-ink: #2b1a00;
+    --danger: #ff6b6b;
+    --radius: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { min-height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding-bottom: 5rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 1.5rem 1.2rem; }
+
+  header { display: flex; align-items: baseline; gap: 0.75rem; padding: 0.4rem 0 1.4rem; }
+  header h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.01em; }
+  header h1 .at { color: var(--accent); }
+  header .sub { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+  #whoami { margin-left: auto; font-size: 0.78rem; color: var(--muted); }
+
+  .tabs { display: flex; gap: 0.25rem; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin-bottom: 1.1rem; }
+  .tab {
+    padding: 0.55rem 0.9rem;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.86rem;
+    cursor: pointer;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  .toolbar { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+  .btn {
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-strong);
+    background: var(--card2);
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+  }
+  .btn:hover { border-color: rgba(255,255,255,0.3); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .btn.primary:hover { filter: brightness(1.06); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  #dirtyFlag { font-size: 0.78rem; color: var(--accent); display: none; font-weight: 500; }
+
+  .item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.8rem;
+  }
+  .item.hidden-item { opacity: 0.55; border-style: dashed; }
+  .item-head { display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.8rem; }
+  .item-head .grow { flex: 1; font-weight: 600; font-size: 0.95rem; }
+  .icon-btn {
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--card2);
+    color: var(--muted); cursor: pointer; font-size: 0.8rem;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--border-strong); }
+  .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  .fields .full { grid-column: 1 / -1; }
+  @media (max-width: 620px) { .fields { grid-template-columns: 1fr; } }
+  label { display: block; font-size: 0.76rem; font-weight: 500; color: var(--muted); margin-bottom: 0.3rem; }
+  input[type=text], input[type=password], textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 0.5rem 0.65rem;
+    font: inherit;
+    font-size: 0.88rem;
+  }
+  input[type=text]:focus, input[type=password]:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 70px; }
+  .check { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--muted); cursor: pointer; }
+  .check input { width: 15px; height: 15px; accent-color: var(--accent); }
+  .checks { display: flex; gap: 1.1rem; align-items: center; flex-wrap: wrap; padding-top: 0.2rem; }
+
+  .thumb {
+    width: 64px; height: 64px; border-radius: 8px; flex-shrink: 0;
+    background-size: cover; background-position: center;
+    border: 1px solid var(--border-strong);
+    background-color: var(--bg);
+  }
+  .thumb.round { border-radius: 50%; }
+  .img-row { display: flex; gap: 0.7rem; align-items: flex-end; }
+  .img-row .grow { flex: 1; }
+  .dropzone {
+    display: flex; gap: 0.9rem; align-items: center;
+    border: 1px dashed var(--border-strong);
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .dropzone.dragging { border-color: var(--accent); background: rgba(245, 179, 1, 0.06); }
+  .drop-hint { flex: 1; font-size: 0.78rem; color: var(--muted); text-align: right; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%);
+    background: var(--card2);
+    border: 1px solid var(--border-strong);
+    border-left: 3px solid var(--accent);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 0.65rem 1.1rem;
+    font-size: 0.85rem;
+    z-index: 50;
+    display: none;
+    max-width: 90vw;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+  }
+  #toast.error { border-left-color: var(--danger); }
+
+  #loginOverlay {
+    position: fixed; inset: 0; z-index: 40;
+    background: var(--bg);
+    display: none; align-items: center; justify-content: center; padding: 1.5rem;
+  }
+  #loginOverlay .box {
+    width: min(370px, 92vw);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    padding: 2.1rem 1.8rem 1.9rem;
+    text-align: center;
+    animation: rise 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes rise {
+    from { transform: translateY(28px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .login-logo { width: 112px; display: block; margin: 0 auto 1rem; }
+  #loginOverlay h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.3rem; }
+  #loginOverlay h2 .at { color: var(--accent); }
+  #loginOverlay p { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.1rem; }
+  #loginOverlay input { margin-bottom: 0.8rem; text-align: center; }
+  #loginErr { color: var(--danger); font-size: 0.78rem; margin-top: 0.7rem; display: none; }
+
+  .empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; font-size: 0.85rem; }
+
+  /* photo framing sliders */
+  .framing { display: flex; gap: 1rem; align-items: center; }
+  .framing .sliders { flex: 1; display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 0.7rem; align-items: center; }
+  .framing .sliders span { font-size: 0.74rem; color: var(--muted); }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .css-link { font-size: 0.74rem; color: var(--muted); cursor: pointer; text-decoration: underline; }
+  .css-link:hover { color: var(--text); }
+
+  /* messages inbox */
+  .item.unread { border-left: 3px solid var(--accent); }
+  .msg-meta { font-size: 0.74rem; color: var(--muted); }
+  .msg-body { white-space: pre-wrap; font-size: 0.88rem; line-height: 1.55; }
+
+  /* orders + printful import */
+  .order-line { font-size: 0.84rem; color: var(--muted); line-height: 1.6; }
+  .order-line a { color: var(--accent); }
+  .pf-panel { border: 1px dashed var(--border-strong); border-radius: var(--radius); padding: 1rem 1.1rem; margin-bottom: 1rem; background: var(--card); }
+  .pf-row { display: flex; gap: 0.8rem; align-items: center; padding: 0.45rem 0; border-bottom: 1px solid var(--border); }
+  .pf-row:last-child { border-bottom: none; }
+  .pf-row .thumb { width: 40px; height: 40px; }
+  .pf-row .grow { flex: 1; font-size: 0.86rem; }
+  .pf-note { font-size: 0.74rem; color: var(--muted); margin-top: 0.6rem; }
+
+  /* analytics */
+  .stat-tiles { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .tile {
+    flex: 1; min-width: 130px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--card); padding: 0.9rem 1rem;
+  }
+  .tile .num { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.02em; }
+  .tile .lbl { font-size: 0.76rem; color: var(--muted); margin-top: 0.15rem; }
+  .chart-card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 1rem 1.1rem; }
+  .chart { display: flex; align-items: flex-end; gap: 2px; height: 140px; }
+  .chart .bar { flex: 1; background: var(--accent); border-radius: 3px 3px 0 0; min-height: 2px; opacity: 0.9; }
+  .chart .bar:hover { opacity: 1; }
+  .chart .bar.zero { background: rgba(255,255,255,0.1); }
+  .chart-x { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); margin-top: 0.45rem; }
+  .range-row { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; }
+  .range-btn { padding: 0.35rem 0.8rem; font-size: 0.78rem; }
+  .range-btn.on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .chart.monthly { height: 170px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0.25rem; height: 100%; }
+  .bar-col .bar { width: 100%; flex: none; }
+  .bar-num { font-size: 0.72rem; color: var(--text); font-weight: 600; }
+  .bar-mon { font-size: 0.68rem; color: var(--muted); margin-top: 0.25rem; }
+  .month-list { margin-top: 1rem; }
+  .month-row { display: flex; justify-content: space-between; padding: 0.4rem 0.1rem; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
+  .month-row:last-child { border-bottom: none; }
+  .month-row .v { font-weight: 600; }
+  #barTip {
+    position: fixed; z-index: 60; display: none; pointer-events: none;
+    background: var(--card2); border: 1px solid var(--border-strong);
+    border-radius: 7px; padding: 0.3rem 0.6rem; font-size: 0.76rem; color: var(--text);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
+  .col-label { font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin: 0.2rem 0 0.7rem; font-weight: 700; }
+  .col-label:not(:first-child) { margin-top: 1.4rem; }
+</style>
+</head>
+<body>
+
+<div id="loginOverlay">
+  <div class="box">
+    <img class="login-logo" src="https://wizardshit.store/wizshtlogo_trans.png" alt="Madam Studio" onerror="this.style.display='none'">
+    <h2>Madam Studio</h2>
+    <p>Owners only — enter the admin password.</p>
+    <input type="password" id="pwInput" placeholder="password" autocomplete="current-password">
+    <button class="btn primary" id="pwBtn" style="width:100%">Enter</button>
+    <div id="gDivider" style="display:none;margin:0.9rem 0 0.7rem;font-size:0.78rem;color:var(--muted)">or</div>
+    <div id="gBtn" style="display:flex;justify-content:center"></div>
+    <div id="loginErr"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <h1>Madam Studio</h1>
+    <div class="sub">Control Room</div>
+    <div id="whoami"></div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="claims">Wizard IDs</button>
+    <button class="tab" data-tab="creators">Creators</button>
+    <button class="tab" data-tab="uploads">Uploads</button>
+    <button class="tab" data-tab="payments">Payments</button>
+    <button class="tab" data-tab="apps">Apps</button>
+    <button class="tab" data-tab="panels">Panels</button>
+  </nav>
+
+  <div class="toolbar">
+    <button class="btn" id="addBtn">+ Add</button>
+    <span id="dirtyFlag">● unsaved changes</span>
+    <span style="flex:1"></span>
+    <button class="btn" id="reloadBtn">Reload</button>
+    <button class="btn primary" id="saveBtn">Save &amp; publish</button>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var API = "https://wizardshit.store";
+
+  var state = { merch: [], credits: [], donators: [], panels: [] };
+  var claims = null;       // fetched on first visit to WIZARD IDS
+  var uploads = null;      // fetched on first visit to UPLOADS / CREATORS
+  var pickedCreator = '';  // the creator selected in the split CREATORS dashboard
+  var payments = null;     // fetched on first visit to PAYMENTS
+  var apps = null;         // fetched on first visit to APPS
+  var googleReady = false;
+  var tab = 'claims';
+  var dirty = false;
+  var SITE = 'https://wizardshit.store/';
+
+  var listEl = document.getElementById('list');
+  var toastEl = document.getElementById('toast');
+  var dirtyEl = document.getElementById('dirtyFlag');
+
+  function toast(msg, isErr) {
+    toastEl.textContent = msg;
+    toastEl.className = isErr ? 'error' : '';
+    toastEl.style.display = 'block';
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(function () { toastEl.style.display = 'none'; }, isErr ? 6000 : 2500);
+  }
+
+  function setDirty(v) {
+    dirty = v;
+    dirtyEl.style.display = v ? 'inline' : 'none';
+  }
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* ---- auth-aware fetch ---- */
+  function authHeaders() {
+    var h = {};
+    var pw = sessionStorage.getItem('madampw');
+    if (pw) h['Authorization'] = 'Bearer ' + pw;
+    return h;
+  }
+  function api(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({}, opts.headers || {}, authHeaders());
+    return fetch(API + path, opts).then(function (res) {
+      if (res.status === 401) {
+        document.getElementById('loginOverlay').style.display = 'flex';
+        setupGoogleButton();
+        throw new Error('login required');
+      }
+      return res.json().then(function (data) {
+        if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+        return data;
+      });
+    });
+  }
+
+  /* ---- Google sign-in on the login overlay ---- */
+  function setupGoogleButton() {
+    if (googleReady) return;
+    fetch(API + '/api/login-config')
+      .then(function (r) { return r.json(); })
+      .then(function (cfg) {
+        if (!cfg.google_client_id) return;
+        var s = document.createElement('script');
+        s.src = 'https://accounts.google.com/gsi/client';
+        s.async = true;
+        s.onload = function () {
+          if (googleReady || !window.google) return;
+          googleReady = true;
+          window.google.accounts.id.initialize({
+            client_id: cfg.google_client_id,
+            callback: function (resp) {
+              fetch(API + '/api/glogin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: resp.credential })
+              })
+                .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+                .then(function (out) {
+                  if (!out.ok) {
+                    var err = document.getElementById('loginErr');
+                    err.textContent = out.d.error || 'Sign-in failed';
+                    err.style.display = 'block';
+                    return;
+                  }
+                  sessionStorage.setItem('madampw', out.d.token);
+                  document.getElementById('loginOverlay').style.display = 'none';
+                  boot();
+                })
+                .catch(function () { toast('Network error', true); });
+            }
+          });
+          document.getElementById('gDivider').style.display = 'block';
+          window.google.accounts.id.renderButton(document.getElementById('gBtn'), {
+            theme: 'filled_black', size: 'large', text: 'signin_with', width: 260
+          });
+        };
+        document.head.appendChild(s);
+      })
+      .catch(function () {});
+  }
+
+  document.getElementById('pwBtn').onclick = tryLogin;
+  document.getElementById('pwInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') tryLogin();
+  });
+  function tryLogin() {
+    var pw = document.getElementById('pwInput').value;
+    sessionStorage.setItem('madampw', pw);
+    fetch(API + '/api/admin/login', { method: 'POST', headers: authHeaders() })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (out) {
+        if (!out.ok) {
+          sessionStorage.removeItem('madampw');
+          var err = document.getElementById('loginErr');
+          err.textContent = out.d.error || 'Login failed';
+          err.style.display = 'block';
+          return;
+        }
+        document.getElementById('loginOverlay').style.display = 'none';
+        boot();
+      })
+      .catch(function () { toast('Network error', true); });
+  }
+
+  /* ---- rendering ---- */
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function imgPreviewUrl(v) {
+    if (!v) return '';
+    if (/^https?:\/\//i.test(v)) return v;
+    return SITE + v.replace(/^\//, '');
+  }
+
+  function field(labelText, value, onInput, full, multiline) {
+    var box = el('div', full ? 'full' : '');
+    box.appendChild(el('label', '', labelText));
+    var input = multiline ? el('textarea') : el('input');
+    if (!multiline) input.type = 'text';
+    input.value = value || '';
+    input.addEventListener('input', function () { onInput(input.value); setDirty(true); });
+    box.appendChild(input);
+    return box;
+  }
+
+  // The picture, a drag-and-drop zone, and an upload button — the file's
+  // address is tracked behind the scenes, owners never see it.
+  function imageField(labelText, item, key, round) {
+    var box = el('div', 'full');
+    box.appendChild(el('label', '', labelText));
+    var zone = el('div', 'dropzone');
+    var thumb = el('div', 'thumb' + (round ? ' round' : ''));
+    thumb.style.width = '72px';
+    thumb.style.height = '72px';
+    function refresh() {
+      var u = imgPreviewUrl(item[key]);
+      thumb.style.backgroundImage = u ? 'url("' + u.replace(/"/g, '%22') + '")' : 'none';
+    }
+    refresh();
+    var hint = el('div', 'drop-hint', 'drag a picture here, or');
+    var up = el('button', 'btn', item[key] ? 'Change image' : 'Upload image');
+    up.type = 'button';
+    var file = el('input');
+    file.type = 'file';
+    file.accept = 'image/*';
+    file.style.display = 'none';
+
+    function doUpload(f) {
+      if (!f) return;
+      if (!/^image\//.test(f.type)) { toast('That is not an image file', true); return; }
+      up.disabled = true;
+      up.textContent = '...';
+      fetch(API + '/api/admin/upload?name=' + encodeURIComponent(f.name), {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': f.type }, authHeaders()),
+        body: f
+      })
+        .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || 'upload failed'); return d; }); })
+        .then(function (d) {
+          item[key] = d.url;
+          refresh();
+          setDirty(true);
+          toast('Image uploaded');
+        })
+        .catch(function (e) { toast(e.message, true); })
+        .then(function () {
+          up.disabled = false;
+          up.textContent = item[key] ? 'Change image' : 'Upload image';
+        });
+    }
+
+    up.onclick = function () { file.click(); };
+    thumb.style.cursor = 'pointer';
+    thumb.title = 'Click to pick an image';
+    thumb.onclick = function () { file.click(); };
+    file.addEventListener('change', function () { doUpload(file.files[0]); file.value = ''; });
+
+    ['dragenter', 'dragover'].forEach(function (evName) {
+      zone.addEventListener(evName, function (e) { e.preventDefault(); zone.classList.add('dragging'); });
+    });
+    ['dragleave', 'drop'].forEach(function (evName) {
+      zone.addEventListener(evName, function (e) { e.preventDefault(); zone.classList.remove('dragging'); });
+    });
+    zone.addEventListener('drop', function (e) {
+      doUpload(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]);
+    });
+
+    zone.appendChild(thumb);
+    zone.appendChild(hint);
+    zone.appendChild(up);
+    zone.appendChild(file);
+    box.appendChild(zone);
+    return box;
+  }
+
+  function itemShell(items, i, titleText, bodyEl) {
+    var item = items[i];
+    var card = el('div', 'item' + (item.visible ? '' : ' hidden-item'));
+    var head = el('div', 'item-head');
+    var title = el('strong', 'grow', titleText || '(untitled)');
+    title.style.letterSpacing = '0.06em';
+    head.appendChild(title);
+
+    var upB = el('button', 'icon-btn', '↑');
+    upB.title = 'Move up';
+    upB.onclick = function () { if (i > 0) { items.splice(i - 1, 0, items.splice(i, 1)[0]); setDirty(true); render(); } };
+    var downB = el('button', 'icon-btn', '↓');
+    downB.title = 'Move down';
+    downB.onclick = function () { if (i < items.length - 1) { items.splice(i + 1, 0, items.splice(i, 1)[0]); setDirty(true); render(); } };
+    var eyeB = el('button', 'icon-btn', item.visible ? '👁' : '✖');
+    eyeB.title = item.visible ? 'Visible on the site — click to hide' : 'Hidden from the site — click to show';
+    eyeB.onclick = function () { item.visible = item.visible ? 0 : 1; setDirty(true); render(); };
+    var delB = el('button', 'icon-btn danger', '🗑');
+    delB.title = 'Delete';
+    delB.onclick = function () {
+      if (confirm('Delete "' + (titleText || 'this item') + '"? (Takes effect when you hit SAVE)')) {
+        items.splice(i, 1);
+        setDirty(true);
+        render();
+      }
+    };
+    head.appendChild(upB);
+    head.appendChild(downB);
+    head.appendChild(eyeB);
+    head.appendChild(delB);
+    card.appendChild(head);
+    card.appendChild(bodyEl);
+    return card;
+  }
+
+  // Square panels for the madamstudio creator pages. "creator" must match a
+  // credit card name exactly; the word "shared" puts the panel in the
+  // recent-projects column that every creator's page shows on the right.
+  function renderPanels() {
+    state.panels.forEach(function (item, i) {
+      var body = el('div', 'fields');
+      body.appendChild(field('Creator (credit card name, or "shared")', item.creator, function (v) { item.creator = v; }));
+      body.appendChild(field('Title', item.title, function (v) { item.title = v; }));
+      body.appendChild(field('Link (optional — where clicking the panel goes)', item.url, function (v) { item.url = v; }, true));
+      body.appendChild(imageField('Picture', item, 'image'));
+      listEl.appendChild(itemShell(state.panels, i, (item.creator || '?') + ' — ' + (item.title || '(untitled)'), body));
+    });
+  }
+
+  /* ---- wizard ID claims ---- */
+  function loadClaims() {
+    api('/api/admin/claims')
+      .then(function (d) { claims = d.claims; render(); })
+      .catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
+  }
+
+  function claimAction(id, pathSuffix, method) {
+    api('/api/admin/claims/' + id + pathSuffix, { method: method }).then(loadClaims)
+      .catch(function (e) { toast(e.message, true); });
+  }
+
+  // Verify board. Each claim is a light: red = requested, yellow = staged,
+  // green = on (this account can now use the creator hub). Deny parks it.
+  var LIGHT = { pending: ['🔴', 'Requested'], staged: ['🟡', 'Staged'], verified: ['🟢', 'On'], denied: ['⚫', 'Denied'] };
+  function renderClaims() {
+    if (claims === null) {
+      listEl.appendChild(el('div', 'empty', 'Fetching the verify board…'));
+      return;
+    }
+    if (!claims.length) {
+      listEl.appendChild(el('div', 'empty', 'No claims yet. When someone signs in and claims their crew card on madamstudio, they land here: red → stage to yellow → turn on to green to open their hub.'));
+      return;
+    }
+    claims.forEach(function (c) {
+      var light = LIGHT[c.status] || LIGHT.pending;
+      var card = el('div', 'item' + (c.status === 'pending' ? ' unread' : ''));
+      var head = el('div', 'item-head');
+      var who = c.credit_name + ' — ' + c.email + (c.account_username ? ' (@' + c.account_username + ')' : '');
+      head.appendChild(el('strong', 'grow', light[0] + ' ' + who));
+      head.appendChild(el('span', 'msg-meta', light[1].toUpperCase() + ' · ' + (c.created_at || '').slice(0, 16)));
+      if (c.status !== 'staged' && c.status !== 'verified') {
+        var stageB = el('button', 'btn', 'Stage');
+        stageB.onclick = function () { claimAction(c.id, '/stage', 'POST'); };
+        head.appendChild(stageB);
+      }
+      if (c.status !== 'verified') {
+        var onB = el('button', 'btn', 'Turn on');
+        onB.title = 'Verify — opens their creator hub';
+        onB.onclick = function () { claimAction(c.id, '/verify', 'POST'); };
+        head.appendChild(onB);
+      } else {
+        var offB = el('button', 'btn', 'Turn off');
+        offB.title = 'Back to staged — closes their hub';
+        offB.onclick = function () { claimAction(c.id, '/stage', 'POST'); };
+        head.appendChild(offB);
+      }
+      if (c.status !== 'denied') {
+        var noB = el('button', 'icon-btn', '✕');
+        noB.title = 'Deny';
+        noB.onclick = function () { claimAction(c.id, '/deny', 'POST'); };
+        head.appendChild(noB);
+      }
+      var delB = el('button', 'icon-btn danger', '🗑');
+      delB.title = 'Delete';
+      delB.onclick = function () {
+        if (!confirm('Delete this claim forever?')) return;
+        claimAction(c.id, '', 'DELETE');
+      };
+      head.appendChild(delB);
+      card.appendChild(head);
+      listEl.appendChild(card);
+    });
+  }
+
+  /* ---- applications ---- */
+  function loadApps() {
+    api('/api/admin/applications')
+      .then(function (d) { apps = d.applications; render(); })
+      .catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
+  }
+
+  function renderApps() {
+    if (apps === null) {
+      listEl.appendChild(el('div', 'empty', 'Fetching applications…'));
+      return;
+    }
+    if (!apps.length) {
+      listEl.appendChild(el('div', 'empty', 'No applications yet. The Apply page on madamstudio delivers here — and only here.'));
+      return;
+    }
+    apps.forEach(function (a) {
+      var card = el('div', 'item' + (a.read ? '' : ' unread'));
+      var head = el('div', 'item-head');
+      head.appendChild(el('strong', 'grow', (a.name || 'anonymous') + ' — ' + a.email));
+      head.appendChild(el('span', 'msg-meta', (a.created_at || '').slice(0, 16)));
+      var readB = el('button', 'icon-btn', a.read ? '↺' : '✓');
+      readB.title = a.read ? 'Mark unread' : 'Mark read';
+      readB.onclick = function () {
+        api('/api/admin/applications/' + a.id + '/read', { method: 'POST' }).then(loadApps)
+          .catch(function (e) { toast(e.message, true); });
+      };
+      var delB = el('button', 'icon-btn danger', '🗑');
+      delB.title = 'Delete';
+      delB.onclick = function () {
+        if (!confirm('Delete this application forever?')) return;
+        api('/api/admin/applications/' + a.id, { method: 'DELETE' }).then(loadApps)
+          .catch(function (e) { toast(e.message, true); });
+      };
+      head.appendChild(readB);
+      head.appendChild(delB);
+      card.appendChild(head);
+      if (a.portfolio) {
+        var link = el('div', 'msg-body');
+        var aEl = el('a', '', a.portfolio);
+        aEl.href = a.portfolio;
+        aEl.target = '_blank';
+        aEl.rel = 'noopener';
+        link.appendChild(aEl);
+        card.appendChild(link);
+      }
+      if (a.message) card.appendChild(el('div', 'msg-body', a.message));
+      listEl.appendChild(card);
+    });
+  }
+
+  /* ---- creator work uploads ---- */
+  function loadUploads() {
+    api('/api/admin/uploads')
+      .then(function (d) { uploads = d.uploads; render(); })
+      .catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
+  }
+
+  function uploadAction(id, pathSuffix, method) {
+    api('/api/admin/uploads/' + id + pathSuffix, { method: method }).then(loadUploads)
+      .catch(function (e) { toast(e.message, true); });
+  }
+
+  function renderUploads() {
+    if (uploads === null) {
+      listEl.appendChild(el('div', 'empty', 'Fetching uploads…'));
+      return;
+    }
+    if (!uploads.length) {
+      listEl.appendChild(el('div', 'empty', 'No uploads yet. Creators send work from their madamstudio page; it lands here to be marked seen, verified, and paid.'));
+      return;
+    }
+    uploads.forEach(function (u) {
+      var card = el('div', 'item' + (u.status === 'new' ? ' unread' : ''));
+      var head = el('div', 'item-head');
+      var thumb = el('a', 'thumb');
+      thumb.href = u.image;
+      thumb.target = '_blank';
+      thumb.style.width = '52px';
+      thumb.style.height = '52px';
+      thumb.style.flexShrink = '0';
+      thumb.style.backgroundImage = 'url("' + (u.image || '').replace(/"/g, '%22') + '")';
+      thumb.title = 'Open full size';
+      head.appendChild(thumb);
+      head.appendChild(el('strong', 'grow', u.creator + (u.title ? ' — ' + u.title : '')));
+      head.appendChild(el('span', 'msg-meta', u.status.toUpperCase() + ' · ' + (u.created_at || '').slice(0, 16)));
+      ['seen', 'verified', 'paid'].forEach(function (s) {
+        if (u.status === s) return;
+        var b = el('button', 'btn', s);
+        b.style.textTransform = 'uppercase';
+        b.onclick = function () { uploadAction(u.id, '/' + s, 'POST'); };
+        head.appendChild(b);
+      });
+      var delB = el('button', 'icon-btn danger', '🗑');
+      delB.title = 'Delete (also removes the image)';
+      delB.onclick = function () {
+        if (!confirm('Delete this upload forever?')) return;
+        uploadAction(u.id, '', 'DELETE');
+      };
+      head.appendChild(delB);
+      card.appendChild(head);
+      listEl.appendChild(card);
+    });
+  }
+
+  /* ---- Creators: split founder dashboard ----
+     Left = pick one creator and drop work straight into their feed (lands
+     verified/live immediately). Right = the shared crew activity feed, the
+     same for every founder. Both read the same uploads list. */
+  function uploadCardEl(u, manage) {
+    var card = el('div', 'item' + (u.status === 'new' ? ' unread' : ''));
+    var head = el('div', 'item-head');
+    var thumb = el('a', 'thumb');
+    thumb.href = u.image; thumb.target = '_blank';
+    thumb.style.width = '46px'; thumb.style.height = '46px'; thumb.style.flexShrink = '0';
+    thumb.style.backgroundImage = 'url("' + (u.image || '').replace(/"/g, '%22') + '")';
+    head.appendChild(thumb);
+    head.appendChild(el('strong', 'grow', (manage ? '' : u.creator + ' — ') + (u.title || '(untitled)')));
+    head.appendChild(el('span', 'msg-meta', u.status.toUpperCase() + ' · ' + (u.created_at || '').slice(0, 16)));
+    if (manage) {
+      ['seen', 'verified', 'paid'].forEach(function (s) {
+        if (u.status === s) return;
+        var b = el('button', 'btn', s); b.style.textTransform = 'uppercase';
+        b.onclick = function () { uploadAction(u.id, '/' + s, 'POST'); };
+        head.appendChild(b);
+      });
+      var delB = el('button', 'icon-btn danger', '🗑');
+      delB.title = 'Delete';
+      delB.onclick = function () { if (confirm('Delete this upload forever?')) uploadAction(u.id, '', 'DELETE'); };
+      head.appendChild(delB);
+    }
+    card.appendChild(head);
+    return card;
+  }
+
+  function renderCreators() {
+    if (uploads === null) {
+      listEl.appendChild(el('div', 'empty', 'Loading the crew dashboard…'));
+      return;
+    }
+    var split = el('div');
+    split.style.display = 'grid';
+    split.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
+    split.style.gap = '1.2rem';
+    split.style.alignItems = 'start';
+
+    /* ---- LEFT: one creator ---- */
+    var left = el('div');
+    left.appendChild(el('div', 'col-label', 'Upload to a creator'));
+    var names = state.credits.map(function (c) { return c.name; }).filter(Boolean);
+    if (!pickedCreator && names.length) pickedCreator = names[0];
+    var sel = el('select');
+    names.forEach(function (n) { sel.appendChild(new Option(n, n)); });
+    sel.value = pickedCreator;
+    sel.onchange = function () { pickedCreator = sel.value; render(); };
+    left.appendChild(sel);
+
+    var drop = el('div', 'item');
+    var file = el('input'); file.type = 'file'; file.accept = 'image/png,image/jpeg,image/gif,image/webp';
+    var upBtn = el('button', 'btn primary', 'Choose image → upload to ' + (pickedCreator || 'creator'));
+    upBtn.style.width = '100%';
+    upBtn.onclick = function () { file.click(); };
+    file.onchange = function () {
+      var f = file.files[0]; file.value = '';
+      if (!f || !pickedCreator) return;
+      upBtn.disabled = true; upBtn.textContent = 'Uploading…';
+      var title = f.name.replace(/\.[a-z0-9]+$/i, '').slice(0, 100);
+      fetch(API + '/api/admin/upload-for?creator=' + encodeURIComponent(pickedCreator) + '&title=' + encodeURIComponent(title), {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': f.type }, authHeaders()),
+        body: f,
+      }).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || 'upload failed'); return d; }); })
+        .then(function () { toast('Added to ' + pickedCreator); uploads = null; loadUploads(); })
+        .catch(function (e) { toast(e.message, true); upBtn.disabled = false; upBtn.textContent = 'Choose image → upload'; });
+    };
+    drop.appendChild(upBtn);
+    drop.appendChild(file);
+    left.appendChild(drop);
+
+    var mine = uploads.filter(function (u) { return u.creator === pickedCreator; });
+    left.appendChild(el('div', 'col-label', (pickedCreator || 'Creator') + "'s work · " + mine.length));
+    if (!mine.length) left.appendChild(el('div', 'empty', 'Nothing yet — drop the first piece above.'));
+    mine.forEach(function (u) { left.appendChild(uploadCardEl(u, true)); });
+
+    /* ---- RIGHT: shared crew feed ---- */
+    var right = el('div');
+    right.appendChild(el('div', 'col-label', 'Crew activity — everyone'));
+    if (!uploads.length) right.appendChild(el('div', 'empty', 'No work uploaded yet.'));
+    uploads.slice(0, 40).forEach(function (u) { right.appendChild(uploadCardEl(u, false)); });
+
+    split.appendChild(left);
+    split.appendChild(right);
+    listEl.appendChild(split);
+  }
+
+  /* ---- payments ---- */
+  function loadPayments() {
+    api('/api/admin/payments')
+      .then(function (d) { payments = d.payments; render(); })
+      .catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
+  }
+
+  function money(n) { return '$' + (Number(n) || 0).toFixed(2); }
+
+  function renderPayments() {
+    if (payments === null) {
+      listEl.appendChild(el('div', 'empty', 'Fetching payments…'));
+      return;
+    }
+    // "Record a payment" form: creator dropdown from credits, amount, note.
+    var form = el('div', 'item');
+    var fields = el('div', 'fields');
+    var creatorNames = state.credits.map(function (c) { return c.name; }).filter(Boolean);
+    var selWrap = el('div', 'full');
+    selWrap.appendChild(el('label', '', 'Creator'));
+    var sel = el('select');
+    sel.appendChild(new Option('Select a creator…', ''));
+    creatorNames.forEach(function (n) { sel.appendChild(new Option(n, n)); });
+    selWrap.appendChild(sel);
+    fields.appendChild(selWrap);
+    var amtWrap = el('div');
+    amtWrap.appendChild(el('label', '', 'Amount ($)'));
+    var amt = el('input'); amt.type = 'number'; amt.min = '0'; amt.step = '0.01';
+    amtWrap.appendChild(amt);
+    fields.appendChild(amtWrap);
+    var noteWrap = el('div');
+    noteWrap.appendChild(el('label', '', 'Note (what for)'));
+    var note = el('input'); note.type = 'text';
+    noteWrap.appendChild(note);
+    fields.appendChild(noteWrap);
+    var payBtn = el('button', 'btn primary', 'Record payment');
+    payBtn.onclick = function () {
+      if (!sel.value) { toast('Pick a creator', true); return; }
+      if (!(Number(amt.value) > 0)) { toast('Enter an amount', true); return; }
+      payBtn.disabled = true;
+      api('/api/admin/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creator: sel.value, amount: Number(amt.value), note: note.value }),
+      }).then(function () { toast('Payment recorded'); payments = null; loadPayments(); })
+        .catch(function (e) { toast(e.message, true); payBtn.disabled = false; });
+    };
+    fields.appendChild(payBtn);
+    form.appendChild(fields);
+    listEl.appendChild(form);
+
+    if (!payments.length) {
+      listEl.appendChild(el('div', 'empty', 'No payments recorded yet.'));
+      return;
+    }
+    // Per-creator totals.
+    var totals = {};
+    payments.forEach(function (p) { totals[p.creator] = (totals[p.creator] || 0) + (Number(p.amount) || 0); });
+    var grand = payments.reduce(function (s, p) { return s + (Number(p.amount) || 0); }, 0);
+    var sum = el('div', 'item');
+    sum.appendChild(el('strong', '', 'Paid out: ' + money(grand)));
+    var byLine = Object.keys(totals).map(function (k) { return k + ' ' + money(totals[k]); }).join('  ·  ');
+    sum.appendChild(el('div', 'msg-meta', byLine));
+    listEl.appendChild(sum);
+
+    payments.forEach(function (p) {
+      var card = el('div', 'item');
+      var head = el('div', 'item-head');
+      head.appendChild(el('strong', 'grow', p.creator + ' — ' + money(p.amount) + (p.note ? '  (' + p.note + ')' : '')));
+      head.appendChild(el('span', 'msg-meta', (p.created_at || '').slice(0, 16)));
+      var delB = el('button', 'icon-btn danger', '🗑');
+      delB.title = 'Delete';
+      delB.onclick = function () {
+        if (!confirm('Delete this payment record?')) return;
+        api('/api/admin/payments/' + p.id, { method: 'DELETE' }).then(function () { payments = null; loadPayments(); })
+          .catch(function (e) { toast(e.message, true); });
+      };
+      head.appendChild(delB);
+      card.appendChild(head);
+      listEl.appendChild(card);
+    });
+  }
+
+  function render() {
+    listEl.innerHTML = '';
+    var editable = tab === 'panels';
+    document.getElementById('addBtn').style.display = editable ? '' : 'none';
+    document.getElementById('saveBtn').style.display = editable ? '' : 'none';
+    if (tab === 'claims') { renderClaims(); return; }
+    else if (tab === 'creators') { renderCreators(); return; }
+    else if (tab === 'uploads') { renderUploads(); return; }
+    else if (tab === 'payments') { renderPayments(); return; }
+    else if (tab === 'apps') { renderApps(); return; }
+    else if (tab === 'panels') renderPanels();
+    if (!state[tab].length) {
+      listEl.appendChild(el('div', 'empty', 'Nothing here yet — hit + ADD.'));
+    }
+  }
+
+  /* ---- toolbar ---- */
+  document.querySelectorAll('.tab').forEach(function (btn) {
+    btn.onclick = function () {
+      document.querySelectorAll('.tab').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      tab = btn.dataset.tab;
+      render();
+      if (tab === 'claims' && claims === null) loadClaims();
+      if ((tab === 'uploads' || tab === 'creators') && uploads === null) loadUploads();
+      if (tab === 'payments' && payments === null) loadPayments();
+      if (tab === 'apps' && apps === null) loadApps();
+    };
+  });
+
+  document.getElementById('addBtn').onclick = function () {
+    var fresh;
+    if (tab === 'panels') fresh = { creator: '', title: '', url: '', image: '', visible: 1 };
+    else return;
+    state[tab].unshift(fresh);
+    setDirty(true);
+    render();
+  };
+
+  document.getElementById('reloadBtn').onclick = function () {
+    if (tab === 'claims') { claims = null; render(); loadClaims(); return; }
+    if (tab === 'uploads' || tab === 'creators') { uploads = null; render(); loadUploads(); return; }
+    if (tab === 'payments') { payments = null; render(); loadPayments(); return; }
+    if (tab === 'apps') { apps = null; render(); loadApps(); return; }
+    if (dirty && !confirm('Throw away unsaved changes and reload?')) return;
+    load();
+  };
+
+  document.getElementById('saveBtn').onclick = function () {
+    var btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    api('/api/admin/collection/' + tab, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state[tab])
+    })
+      .then(function (d) {
+        setDirty(false);
+        toast('Saved — ' + d.saved + ' item' + (d.saved === 1 ? '' : 's') + ' live on the site ✨');
+      })
+      .catch(function (e) { if (e.message !== 'login required') toast(e.message, true); })
+      .then(function () { btn.disabled = false; });
+  };
+
+  /* ---- boot ---- */
+  function load() {
+    api('/api/admin/content')
+      .then(function (data) {
+        state = data;
+        setDirty(false);
+        render();
+      })
+      .catch(function (e) { if (e.message !== 'login required') toast(e.message, true); });
+  }
+
+  function boot() {
+    fetch(API + '/api/admin/login', { method: 'POST', headers: authHeaders() })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
+      .then(function (out) {
+        if (!out.ok) {
+          if (out.status === 401) {
+            document.getElementById('loginOverlay').style.display = 'flex';
+            setupGoogleButton();
+          } else toast(out.d.error || 'Backend not ready', true);
+          return;
+        }
+        document.getElementById('whoami').textContent =
+          'logged in' + (out.d.email && out.d.email !== 'owner' ? ' as ' + out.d.email : '') +
+          (out.d.mode === 'access' ? ' via Cloudflare Access' : out.d.mode === 'google' ? ' via Google' : '');
+        load();
+      })
+      .catch(function () { toast('Cannot reach the backend', true); });
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
