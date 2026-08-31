@@ -251,6 +251,9 @@
   .cr-h1b { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 22px; }
   .cr-sub { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
 
+  .cr-allcard { border-style: dashed; }
+  .cr-allcard.on { border-style: solid; }
+  .cr-allav { background: var(--accent); color: var(--accent-ink); font-size: 15px; }
   .cr-cardrow { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 14px 0 6px; }
   .cr-pcard { position: relative; background: linear-gradient(180deg, var(--card), var(--card2)); border: 1px solid var(--cr-border-soft); border-radius: 12px; padding: 11px; cursor: pointer; transition: 0.15s; }
   .cr-pcard:hover { border-color: var(--cr-border); }
@@ -288,7 +291,7 @@
   .cr-stagebar { display: flex; align-items: center; gap: 9px; padding: 11px 14px; border-bottom: 1px solid var(--cr-border-soft); background: #360b18; font-size: 12px; color: var(--muted); }
   .cr-crumb b { color: var(--text); font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 14px; }
   .cr-mode { margin-left: auto; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-ink); background: var(--accent); border-radius: 999px; padding: 3px 10px; font-weight: 700; }
-  .cr-mode.grp { color: var(--cr-verified); background: none; border: 1px solid #3f6e52; }
+  .cr-mode.grp { color: var(--cr-text2); background: none; border: 1px solid var(--cr-border); }
   .cr-stageinner { }
   .cr-ssplit { display: grid; grid-template-columns: 1fr 1px 1fr; }
   .cr-ssplit.single { grid-template-columns: 1fr; }
@@ -297,9 +300,8 @@
   .cr-sside { padding: 13px; min-width: 0; }
   .cr-slabel { font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
   .cr-slabel .p { color: var(--accent-ink); background: var(--accent); border-radius: 5px; padding: 2px 7px; }
-  .cr-slabel .g { color: var(--cr-verified); border: 1px solid #3f6e52; border-radius: 5px; padding: 2px 7px; }
+  .cr-slabel .g { color: var(--cr-text2); border: 1px solid var(--cr-border); border-radius: 5px; padding: 2px 7px; }
   .cr-note { font-size: 11.5px; color: var(--muted); margin-bottom: 12px; }
-  .cr-readonly { font-size: 10px; color: var(--muted); margin-top: 10px; font-style: italic; }
 
   .cr-box { display: grid; gap: 8px; }
   .cr-box.split { grid-template-columns: 1fr 1fr; }
@@ -311,6 +313,12 @@
   .cr-box.showcase .cr-tile:first-child:not(.cr-add) { grid-column: 1 / 3; min-height: 100px; }
   .cr-box.stream { grid-template-columns: 1fr; }
   .cr-box.stream .cr-tile { min-height: 42px; }
+  /* three-across layouts */
+  .cr-box.grid { grid-template-columns: 1fr 1fr 1fr; }
+  .cr-box.mosaic { grid-template-columns: 1fr 1fr 1fr; }
+  .cr-box.mosaic .cr-tile:first-child:not(.cr-add) { grid-column: 1 / 3; grid-row: span 2; min-height: 150px; }
+  .cr-box.spotlight { grid-template-columns: 1fr 1fr 1fr; }
+  .cr-box.spotlight .cr-tile:first-child:not(.cr-add) { grid-column: 1 / 4; min-height: 130px; }
   .cr-emptybox { grid-column: 1 / -1; text-align: center; color: var(--muted); font-size: 11px; padding: 22px 8px; border: 1px dashed var(--cr-border-soft); border-radius: 7px; }
 
   .cr-tile { border-radius: 7px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-height: 56px; background: var(--cr-tile); border: 1px solid var(--cr-border-soft); background-size: cover; background-position: center; }
@@ -355,6 +363,11 @@
   .cr-t-showcase { grid-template-rows: 1.4fr 1fr; grid-template-columns: 1fr 1fr 1fr; }
   .cr-t-showcase i:first-child { grid-column: 1 / 4; }
   .cr-t-stream { grid-template-rows: 1fr 1fr 1fr; }
+  .cr-t-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .cr-t-mosaic { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .cr-t-mosaic i:first-child { grid-column: 1 / 3; grid-row: 1 / 3; }
+  .cr-t-spotlight { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1.5fr 1fr; }
+  .cr-t-spotlight i:first-child { grid-column: 1 / 4; }
   .cr-railcap { font-size: 10px; color: var(--muted); text-align: center; margin-top: 8px; line-height: 1.4; }
   .cr-empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; font-size: 0.85rem; }
 </style>
@@ -869,14 +882,21 @@
      sets the selected creator's arrangement (individual) or the public board's
      arrangement (group). Drives creator-config, public-arrangement, upload-for
      and upload-link. */
-  var crState = { person: null, group: null, publicArr: null, publicFetched: false, groupMenu: null };
+  var crState = { person: null, group: null, pub: false, publicArr: null, publicFetched: false, groupMenu: null };
   var CR_GROUPS = [
     { key: 'Advertising', color: '#c9603f' },
     { key: 'Animation', color: '#8a6bb0' },
     { key: 'Animatic', color: '#4a938c' }
   ];
-  var CR_ARRS = ['split', 'gallery', 'feed', 'showcase', 'stream'];
-  var CR_ARR_LBL = { split: 'Split', gallery: 'Gallery', feed: 'Feed', showcase: 'Showcase', stream: 'Stream' };
+  var CR_ARRS = ['split', 'gallery', 'feed', 'showcase', 'stream', 'grid', 'mosaic', 'spotlight'];
+  var CR_ARR_LBL = {
+    split: 'Split', gallery: 'Gallery', feed: 'Feed', showcase: 'Showcase', stream: 'Stream',
+    grid: 'Grid', mosaic: 'Mosaic', spotlight: 'Spotlight'
+  };
+  // How many bars each little preview thumbnail draws.
+  var CR_ARR_BARS = { split: 2, gallery: 6, feed: 2, showcase: 6, stream: 3, grid: 6, mosaic: 3, spotlight: 4 };
+  // Arrangements that lay out three across rather than two.
+  var CR_ARR_WIDE = { grid: 1, mosaic: 1, spotlight: 1 };
   var CR_ICONS = {
     image: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.6"/><path d="M20 16l-4.5-4.5L8 19"/></svg>',
     video: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M11 9.2l4 2.8-4 2.8z" fill="currentColor" stroke="none"/></svg>',
@@ -1050,7 +1070,7 @@
     if (handlers) {
       // Fill out the current row (and give an empty board a full row) with blank
       // "＋ add" slots, so a Split/Gallery/Showcase board shows two across.
-      var cols = (a === 'feed' || a === 'stream') ? 1 : 2;
+      var cols = (a === 'feed' || a === 'stream') ? 1 : (CR_ARR_WIDE[a] ? 3 : 2);
       var rem = items.length % cols;
       var need = rem === 0 ? cols : cols - rem;
       for (var i = 0; i < need; i++) boxEl.appendChild(crAddSlot(handlers));
@@ -1130,7 +1150,34 @@
       card.appendChild(menu);
     }
 
-    card.onclick = function () { crState.person = c.name; crState.group = null; crState.groupMenu = null; render(); };
+    card.onclick = function () { crState.person = c.name; crState.group = null; crState.pub = false; crState.groupMenu = null; render(); };
+    return card;
+  }
+
+  // The shared board, presented as a card alongside the people. Selecting it
+  // edits the one board every creator page shows.
+  function crPublicCardEl() {
+    var card = el('div', 'cr-pcard cr-allcard' + (crState.pub ? ' on' : ''));
+    var row1 = el('div', 'cr-row1');
+    var av = el('div', 'cr-av cr-allav');
+    av.textContent = '\u2605';
+    row1.appendChild(av);
+    var meta = el('div');
+    meta.appendChild(el('div', 'cr-nm', '(all creators)'));
+    meta.appendChild(el('div', 'cr-rl', 'Shown on every creator page'));
+    row1.appendChild(meta);
+    card.appendChild(row1);
+
+    var ups = crUploadsFor('shared').slice(0, 3);
+    var thumbs = el('div', 'cr-thumbs');
+    for (var i = 0; i < 3; i++) {
+      var t = el('i');
+      var u = ups[i];
+      if (u && u.media_type === 'image' && u.image) { t.style.backgroundImage = 'url("' + imgPreviewUrl(u.image).replace(/"/g, '%22') + '")'; }
+      thumbs.appendChild(t);
+    }
+    card.appendChild(thumbs);
+    card.onclick = function () { crState.pub = true; crState.person = null; crState.group = null; crState.groupMenu = null; render(); };
     return card;
   }
 
@@ -1175,7 +1222,7 @@
       var c = crCreditByName(crState.person);
       crumb.innerHTML = 'Editing <b>' + crEsc(c.name) + '</b>';
       mode.textContent = 'Individual'; mode.className = 'cr-mode';
-      var wrap = el('div', 'cr-ssplit');
+      var wrap = el('div', 'cr-ssplit single');
       var L = el('div', 'cr-sside');
       var ll = el('p', 'cr-slabel'); ll.appendChild(el('span', 'p', 'Their board')); L.appendChild(ll);
       var lbox = el('div');
@@ -1184,15 +1231,23 @@
         onLink: function (u, t, ty, btn) { crAddLink(c.name, u, t, ty, btn); }
       });
       L.appendChild(lbox);
-      var D = el('div', 'cr-sdiv');
-      var R = el('div', 'cr-sside');
-      var rl = el('p', 'cr-slabel'); rl.appendChild(el('span', 'g', 'Public · everyone sees this')); R.appendChild(rl);
-      var rbox = el('div');
-      crFillBox(rbox, crUploadsFor('shared'), crState.publicArr || 'split');
-      R.appendChild(rbox);
-      R.appendChild(el('div', 'cr-readonly', 'Read-only here · the same public board everyone sees.'));
-      wrap.appendChild(L); wrap.appendChild(D); wrap.appendChild(R);
+      wrap.appendChild(L);
       inner.appendChild(wrap);
+    } else if (crState.pub) {
+      // The shared board, editable — this is what "(all creators)" opens.
+      crumb.innerHTML = 'Editing <b>(all creators)</b>';
+      mode.textContent = 'Shared board'; mode.className = 'cr-mode';
+      var pwrap = el('div', 'cr-ssplit single');
+      var P = el('div', 'cr-sside');
+      var pl = el('p', 'cr-slabel'); pl.appendChild(el('span', 'p', 'Every creator page')); P.appendChild(pl);
+      var pbox = el('div');
+      crFillBox(pbox, crUploadsFor('shared'), crState.publicArr || 'split', {
+        onImage: function (f, btn) { crUploadImage('shared', f, btn); },
+        onLink: function (u, t, ty, btn) { crAddLink('shared', u, t, ty, btn); }
+      });
+      P.appendChild(pbox);
+      pwrap.appendChild(P);
+      inner.appendChild(pwrap);
     } else if (crState.group) {
       var g = crFindGroup(crState.group);
       var gname = g ? g.key : crState.group;
@@ -1227,7 +1282,7 @@
       inner.appendChild(single);
     } else {
       crumb.textContent = 'Select a card'; mode.style.display = 'none';
-      inner.appendChild(el('div', 'cr-empty', "Pick a person’s card above to edit their split board — or a group on the left to drop content for everyone in it."));
+      inner.appendChild(el('div', 'cr-empty', "Pick a card above to edit that board — (all creators) is the one every creator page shows. Or pick a group on the left to drop content for everyone in it."));
     }
     col.appendChild(stage);
     return col;
@@ -1240,11 +1295,12 @@
     var rail = el('div', 'cr-rail');
     var active = null, mode = null;
     if (crState.person) { var c = crCreditByName(crState.person); active = (c && c.arrangement) || 'split'; mode = 'ind'; }
+    else if (crState.pub) { active = crState.publicArr || 'split'; mode = 'grp'; }
     else if (crState.group) { active = crState.publicArr || 'split'; mode = 'grp'; }
     CR_ARRS.forEach(function (a) {
       var b = el('div', 'cr-arrbtn' + (a === active ? ' on' : ''));
       var t = el('div', 'cr-athumb cr-t-' + a);
-      var n = (a === 'gallery' || a === 'showcase') ? 6 : (a === 'stream' ? 3 : 2);
+      var n = CR_ARR_BARS[a] || 2;
       for (var i = 0; i < n; i++) t.appendChild(el('i'));
       b.appendChild(t);
       b.appendChild(el('div', 'cr-anm', CR_ARR_LBL[a]));
@@ -1271,7 +1327,7 @@
     var top = el('div', 'cr-top');
     top.appendChild(el('div', 'cr-eyebrow', 'Madam Studio · Creators'));
     top.appendChild(el('div', 'cr-h1b', 'Board Editor'));
-    top.appendChild(el('div', 'cr-sub', "Everyone’s cards up top. Click a card to edit that person’s split board; click a group to drop into the whole group."));
+    top.appendChild(el('div', 'cr-sub', "Everyone’s cards up top. Click a card to edit that board — (all creators) is the shared one every creator page shows. Click a group to drop a piece onto all its members at once."));
     root.appendChild(top);
 
     var creds = (state.credits || []).filter(function (c) { return c && c.name; });
@@ -1280,6 +1336,7 @@
     if (!visible.length) {
       cardrow.appendChild(el('div', 'cr-empty', crState.group ? 'No creators in this group yet.' : 'No creators yet — add them on the site first.'));
     }
+    if (!crState.group) cardrow.appendChild(crPublicCardEl());
     visible.forEach(function (c) { cardrow.appendChild(crCardEl(c)); });
     root.appendChild(cardrow);
 
@@ -1379,7 +1436,7 @@
   // guess what a tab is for.
   var TAB_HELP = {
     claims: 'When a crew member signs in and says "that credit card is me", the request lands here. Red = they asked, yellow = staged, green = approved, which is what opens their creator hub.',
-    creators: 'One approved crew member at a time: see everything they have uploaded, and upload work into their feed yourself.',
+    creators: 'Edit what sits on each creator page. Pick a person to edit their board, or (all creators) for the shared board everyone sees. The Arrangement rail sets how the tiles lay out.',
     uploads: 'Every file the crew has sent in, newest first — mark each one seen, approved, or paid.',
     payments: 'What you owe and what you have paid each crew member. Add a payment and it shows up on their side too.',
     apps: 'People who filled out the "join the crew" form on the site and are waiting to hear back.',
