@@ -94,6 +94,13 @@
         <div id="gBtn" style="display:flex;justify-content:center"></div>
       </div>
     </div>
+    <script>
+      // Hide the sign-in card before it paints, so a signed-in visitor never
+      // sees a login form flash past on the way to their dashboard. render()
+      // reveals whichever of the two is right. Left visible without JS, so a
+      // scripting-disabled browser still gets a usable form.
+      document.getElementById("authCard").hidden = true;
+    </script>
 
     <!-- LOGGED IN: dashboard -->
     <div id="dash" hidden>
