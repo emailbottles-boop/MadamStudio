@@ -41,7 +41,8 @@
   header .sub { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
   #whoami { margin-left: auto; font-size: 0.78rem; color: var(--muted); }
 
-  .tabs { display: flex; gap: 0.25rem; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin-bottom: 1.1rem; }
+  .tabs { display: flex; gap: 0.25rem; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin-bottom: 0.7rem; }
+  #tabHelp { color: var(--muted); font-size: 0.82rem; line-height: 1.45; margin-bottom: 1rem; }
   .tab {
     padding: 0.55rem 0.9rem;
     border: none;
@@ -378,9 +379,11 @@
     <button class="tab" data-tab="creators">Creators</button>
     <button class="tab" data-tab="uploads">Uploads</button>
     <button class="tab" data-tab="payments">Payments</button>
-    <button class="tab" data-tab="apps">Apps</button>
-    <button class="tab" data-tab="panels">Panels</button>
+    <button class="tab" data-tab="apps">Applications</button>
+    <button class="tab" data-tab="panels">Creator Panels</button>
   </nav>
+
+  <div id="tabHelp"></div>
 
   <div class="toolbar">
     <button class="btn" id="addBtn">+ Add</button>
@@ -1352,8 +1355,20 @@
     });
   }
 
+  // One plain-English line per tab, shown under the tab row, so nobody has to
+  // guess what a tab is for.
+  var TAB_HELP = {
+    claims: 'When a crew member signs in and says "that credit card is me", the request lands here. Red = they asked, yellow = staged, green = approved, which is what opens their creator hub.',
+    creators: 'One approved crew member at a time: see everything they have uploaded, and upload work into their feed yourself.',
+    uploads: 'Every file the crew has sent in, newest first — mark each one seen, approved, or paid.',
+    payments: 'What you owe and what you have paid each crew member. Add a payment and it shows up on their side too.',
+    apps: 'People who filled out the "join the crew" form on the site and are waiting to hear back.',
+    panels: 'The square tiles on the creator pages. "Creator" has to match a credit card name exactly; the word "shared" puts the tile in the recent-projects column everyone sees.'
+  };
+
   function render() {
     listEl.innerHTML = '';
+    document.getElementById('tabHelp').textContent = TAB_HELP[tab] || '';
     var editable = tab === 'panels';
     document.getElementById('addBtn').style.display = editable ? '' : 'none';
     document.getElementById('saveBtn').style.display = editable ? '' : 'none';
