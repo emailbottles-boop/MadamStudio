@@ -78,6 +78,20 @@
   /* A display rule on a class outranks the hidden attribute, so panels
      like #payWrap would render despite it. Same guard as account/. */
   [hidden] { display: none !important; }
+  .admin-pay { max-width: 900px; margin: 0 auto 26px; padding: 18px 20px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
+  .ap-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+  .ap-field { display: flex; flex-direction: column; gap: 5px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .ap-field.ap-grow { flex: 1; min-width: 180px; }
+  .ap-field input, .ap-field select { font: inherit; font-size: 13px; letter-spacing: normal; text-transform: none; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
+  .ap-row { display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 9px 12px; margin-top: 8px; border: 1px solid var(--border); border-radius: 8px; }
+  .ap-row > div { flex: 1; }
+  .ap-tag { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .ap-tag.ap-deferred { color: #b8860b; border-color: #b8860b; }
+  .ap-tag.ap-iou { color: #b3323c; border-color: #b3323c; }
+  .ap-del { font: inherit; cursor: pointer; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 3px 9px; }
+  .ap-del:hover { color: #b3323c; border-color: #b3323c; }
+  .ap-del:disabled { opacity: .5; cursor: wait; }
+
   .pay { display: flex; gap: 30px; justify-content: center; }
   .pay .stat { text-align: center; }
   .pay .lbl { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
@@ -207,6 +221,14 @@
           <div class="lbl">Paid to date</div>
           <div class="num" id="payTotal">$0</div>
         </div>
+        <div class="stat">
+          <div class="lbl">Deferred pay</div>
+          <div class="num" id="deferTotal">$0</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">IOU</div>
+          <div class="num" id="iouTotal">$0</div>
+        </div>
       </div>
       <span class="badge" id="whoBadge" style="display:none">✓ Verified crew</span>
     </div>
@@ -216,6 +238,36 @@
     This is the Madam Studio crew work portal. If you work here, claim your card on your account to request access — a producer verifies it, then the work opens.
     <div style="margin-top:14px"><a class="btn primary" href="/account/">Claim your card</a></div>
   </div>
+
+  <!-- Producer tools. Stays hidden unless the API confirms an admin session,
+       and every write below is auth-gated server-side either way. -->
+  <section class="admin-pay" id="adminPay" hidden aria-label="Producer tools">
+    <div class="colhead">
+      <span class="lab">Producer tools</span>
+      <span class="meta" id="adminPayWho"></span>
+    </div>
+    <div class="ap-form">
+      <label class="ap-field">
+        <span>Kind</span>
+        <select id="apKind">
+          <option value="paid">Paid</option>
+          <option value="deferred">Deferred pay</option>
+          <option value="iou">IOU</option>
+        </select>
+      </label>
+      <label class="ap-field">
+        <span>Amount ($)</span>
+        <input id="apAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00">
+      </label>
+      <label class="ap-field ap-grow">
+        <span>Note</span>
+        <input id="apNote" type="text" maxlength="500" placeholder="What it's for">
+      </label>
+      <button class="btn" id="apSave" type="button">Record</button>
+    </div>
+    <p class="up-msg" id="apMsg"></p>
+    <div id="apList"></div>
+  </section>
 
   <div class="split" id="workArea">
     <!-- LEFT HALF: your own work — what the admins assigned to you, plus what you upload -->
@@ -412,6 +464,148 @@ uploadFile.addEventListener("change", async () => {
   }
 });
 
+/* ---- producer tools --------------------------------------------------
+   Three figures hang off one ledger: money already paid, pay that is
+   deferred, and IOUs. An admin records them straight from the creator's
+   page instead of going through the Control Room.
+
+   The Control Room keeps its password in sessionStorage on this same
+   origin, so an admin who signed in there is still signed in here. The
+   panel only appears once the API confirms that session, and every write
+   is auth-gated server-side regardless of what this page chooses to show. */
+const KIND_LABEL = { paid: "Paid", deferred: "Deferred", iou: "IOU" };
+
+function adminPw() { try { return sessionStorage.getItem("madampw") || ""; } catch (_) { return ""; } }
+function adminHeaders() { const pw = adminPw(); return pw ? { "Authorization": "Bearer " + pw } : {}; }
+
+function kindOf(row) { return KIND_LABEL[row.kind] ? row.kind : "paid"; }
+function setStat(id, amount) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = "$" + Math.round(amount).toLocaleString("en-US");
+}
+/** Fills the three tiles from a creator's ledger rows and reveals them. */
+function showTotals(rows) {
+  const sums = { paid: 0, deferred: 0, iou: 0 };
+  rows.forEach(r => { sums[kindOf(r)] += Number(r.amount) || 0; });
+  setStat("payTotal", sums.paid);
+  setStat("deferTotal", sums.deferred);
+  setStat("iouTotal", sums.iou);
+  const pw = document.getElementById("payWrap");
+  if (pw) pw.hidden = false;
+  return sums;
+}
+
+async function initAdminPay() {
+  if (!adminPw()) return;
+  try {
+    const res = await fetch(API + "/api/admin/login", { method: "POST", headers: adminHeaders() });
+    if (!res.ok) return;            // not an admin: leave the page exactly as it was
+  } catch (_) { return; }           // backend down: no panel, and no error aimed at a creator
+
+  const wrap = document.getElementById("adminPay");
+  const kindEl = document.getElementById("apKind");
+  const amtEl = document.getElementById("apAmount");
+  const noteEl = document.getElementById("apNote");
+  const saveEl = document.getElementById("apSave");
+  const msgEl = document.getElementById("apMsg");
+  const listEl = document.getElementById("apList");
+  document.getElementById("adminPayWho").textContent = NAME;
+  wrap.hidden = false;
+
+  function say(text, ok) {
+    msgEl.textContent = text;
+    msgEl.className = "up-msg " + (ok ? "ok" : "err");
+  }
+  function noteRow(text) {
+    const d = document.createElement("div");
+    d.className = "empty-note";
+    d.style.textAlign = "left";
+    d.style.marginTop = "10px";
+    d.textContent = text;
+    return d;
+  }
+
+  function entryRow(row) {
+    const line = document.createElement("div");
+    line.className = "ap-row";
+    const body = document.createElement("div");
+    const tag = document.createElement("span");
+    tag.className = "ap-tag ap-" + kindOf(row);
+    tag.textContent = KIND_LABEL[kindOf(row)];
+    const text = document.createElement("span");
+    text.textContent =
+      " $" + (Number(row.amount) || 0).toFixed(2) +
+      (row.note ? " — " + row.note : "") +
+      "  ·  " + (row.created_at || "").slice(0, 10);
+    body.appendChild(tag);
+    body.appendChild(text);
+    const del = document.createElement("button");
+    del.className = "ap-del";
+    del.type = "button";
+    del.title = "Remove this entry";
+    del.textContent = "✕";
+    del.addEventListener("click", async () => {
+      const label = KIND_LABEL[kindOf(row)].toLowerCase();
+      if (!confirm("Remove this " + label + " entry of $" + (Number(row.amount) || 0).toFixed(2) + "?")) return;
+      del.disabled = true;
+      try {
+        const res = await fetch(API + "/api/admin/payments/" + row.id, { method: "DELETE", headers: adminHeaders() });
+        if (!res.ok) throw new Error("delete failed");
+        say("Entry removed.", true);
+        await refresh();
+      } catch (_) {
+        del.disabled = false;
+        say("Couldn't remove that entry.", false);
+      }
+    });
+    line.appendChild(body);
+    line.appendChild(del);
+    return line;
+  }
+
+  async function refresh() {
+    let rows = [];
+    try {
+      const res = await fetch(API + "/api/admin/payments", { headers: adminHeaders() });
+      if (!res.ok) throw new Error("load failed");
+      rows = ((await res.json()).payments || []).filter(r => r.creator === NAME);
+    } catch (_) {
+      listEl.textContent = "";
+      listEl.appendChild(noteRow("Couldn't load this creator's entries."));
+      return;
+    }
+    showTotals(rows);
+    listEl.textContent = "";
+    if (!rows.length) { listEl.appendChild(noteRow("Nothing recorded for " + NAME + " yet.")); return; }
+    rows.forEach(r => listEl.appendChild(entryRow(r)));
+  }
+
+  saveEl.addEventListener("click", async () => {
+    const amount = Number(amtEl.value);
+    if (!(amount > 0)) { say("Enter an amount above zero.", false); return; }
+    saveEl.disabled = true;
+    try {
+      const res = await fetch(API + "/api/admin/payments", {
+        method: "POST",
+        headers: Object.assign({ "Content-Type": "application/json" }, adminHeaders()),
+        body: JSON.stringify({ creator: NAME, amount: amount, note: noteEl.value, kind: kindEl.value }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { say(data.error || "Couldn't save that.", false); return; }
+      amtEl.value = "";
+      noteEl.value = "";
+      say(KIND_LABEL[kindEl.value] + " entry recorded.", true);
+      await refresh();
+    } catch (_) {
+      say("Couldn't reach the backend.", false);
+    } finally {
+      saveEl.disabled = false;
+    }
+  });
+
+  await refresh();
+}
+
 (async () => {
   if (!NAME) { location.replace("/crew/"); return; }
 
@@ -420,6 +614,10 @@ uploadFile.addEventListener("change", async () => {
   whoPhoto.textContent = initials(NAME);
   const gh = document.getElementById("nameGhost");
   if (gh) gh.textContent = (NAME.split(/\s+/).pop() || NAME).toUpperCase();
+
+  // Runs on its own: an admin is not necessarily crew, so this must not sit
+  // behind the member checks below, which return early for anyone who isn't.
+  initAdminPay();
 
   // Public header only: name / role / photo / verified badge. These come from
   // the public credits + claims-public — the WORK below is gated.
@@ -476,21 +674,21 @@ uploadFile.addEventListener("change", async () => {
   let canUpload = (me.creators || []).includes(NAME);
   {
     {
-      // Payments to this creator, visible only to the signed-in owner of the card.
+      // The ledger for this creator, visible only to the signed-in owner of the
+      // card. Deferred pay and IOUs are promises, so they get their own tiles
+      // rather than inflating what has actually been paid.
       if (canUpload) {
         const mine = (me.payments || []).filter(p => p.creator === NAME);
         if (mine.length) {
-          const total = mine.reduce((s, p) => s + (Number(p.amount) || 0), 0);
-          const pt = document.getElementById("payTotal");
-          if (pt) pt.textContent = "$" + Math.round(total).toLocaleString("en-US");
-          const pw = document.getElementById("payWrap");
-          if (pw) pw.hidden = false;
+          const sums = showTotals(mine);
           const list = document.getElementById("paidList");
           list.innerHTML = "";
           const tot = document.createElement("div");
           tot.className = "up-title";
           tot.style.margin = "0 0 8px";
-          tot.textContent = "Total: $" + total.toFixed(2);
+          tot.textContent = "Paid: $" + sums.paid.toFixed(2) +
+            (sums.deferred ? "  ·  Deferred: $" + sums.deferred.toFixed(2) : "") +
+            (sums.iou ? "  ·  IOU: $" + sums.iou.toFixed(2) : "");
           list.appendChild(tot);
           mine.forEach(p => {
             const row = document.createElement("div");
@@ -498,7 +696,7 @@ uploadFile.addEventListener("change", async () => {
             row.style.textAlign = "left";
             row.style.padding = "10px 12px";
             row.style.marginBottom = "8px";
-            row.textContent = "$" + (Number(p.amount) || 0).toFixed(2) + (p.note ? " — " + p.note : "") + "  ·  " + (p.created_at || "").slice(0, 10);
+            row.textContent = KIND_LABEL[kindOf(p)] + "  ·  $" + (Number(p.amount) || 0).toFixed(2) + (p.note ? " — " + p.note : "") + "  ·  " + (p.created_at || "").slice(0, 10);
             list.appendChild(row);
           });
           document.getElementById("paidWrap").hidden = false;

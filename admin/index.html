@@ -1358,6 +1358,10 @@
 
   function money(n) { return '$' + (Number(n) || 0).toFixed(2); }
 
+  // A row written before kinds existed has no kind and is a real payment.
+  var PAY_KIND_LABEL = { paid: 'paid', deferred: 'deferred', iou: 'IOU' };
+  function payKind(p) { return PAY_KIND_LABEL[p.kind] ? p.kind : 'paid'; }
+
   function renderPayments() {
     if (payments === null) {
       listEl.appendChild(el('div', 'empty', 'Fetching payments…'));
@@ -1374,6 +1378,14 @@
     creatorNames.forEach(function (n) { sel.appendChild(new Option(n, n)); });
     selWrap.appendChild(sel);
     fields.appendChild(selWrap);
+    var kindWrap = el('div');
+    kindWrap.appendChild(el('label', '', 'Kind'));
+    var kind = el('select');
+    kind.appendChild(new Option('Paid', 'paid'));
+    kind.appendChild(new Option('Deferred pay', 'deferred'));
+    kind.appendChild(new Option('IOU', 'iou'));
+    kindWrap.appendChild(kind);
+    fields.appendChild(kindWrap);
     var amtWrap = el('div');
     amtWrap.appendChild(el('label', '', 'Amount ($)'));
     var amt = el('input'); amt.type = 'number'; amt.min = '0'; amt.step = '0.01';
@@ -1384,7 +1396,7 @@
     var note = el('input'); note.type = 'text';
     noteWrap.appendChild(note);
     fields.appendChild(noteWrap);
-    var payBtn = el('button', 'btn primary', 'Record payment');
+    var payBtn = el('button', 'btn primary', 'Record entry');
     payBtn.onclick = function () {
       if (!sel.value) { toast('Pick a creator', true); return; }
       if (!(Number(amt.value) > 0)) { toast('Enter an amount', true); return; }
@@ -1392,8 +1404,8 @@
       api('/api/admin/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ creator: sel.value, amount: Number(amt.value), note: note.value }),
-      }).then(function () { toast('Payment recorded'); payments = null; loadPayments(); })
+        body: JSON.stringify({ creator: sel.value, amount: Number(amt.value), note: note.value, kind: kind.value }),
+      }).then(function () { toast('Entry recorded'); payments = null; loadPayments(); })
         .catch(function (e) { toast(e.message, true); payBtn.disabled = false; });
     };
     fields.appendChild(payBtn);
@@ -1401,28 +1413,36 @@
     listEl.appendChild(form);
 
     if (!payments.length) {
-      listEl.appendChild(el('div', 'empty', 'No payments recorded yet.'));
+      listEl.appendChild(el('div', 'empty', 'Nothing recorded yet.'));
       return;
     }
-    // Per-creator totals.
+    // Per-creator totals. Only real payments count as paid out — deferred pay
+    // and IOUs are money still owed, so they are totalled separately.
     var totals = {};
-    payments.forEach(function (p) { totals[p.creator] = (totals[p.creator] || 0) + (Number(p.amount) || 0); });
-    var grand = payments.reduce(function (s, p) { return s + (Number(p.amount) || 0); }, 0);
+    var grand = { paid: 0, deferred: 0, iou: 0 };
+    payments.forEach(function (p) {
+      var k = payKind(p);
+      totals[p.creator] = (totals[p.creator] || 0) + (k === 'paid' ? (Number(p.amount) || 0) : 0);
+      grand[k] += Number(p.amount) || 0;
+    });
     var sum = el('div', 'item');
-    sum.appendChild(el('strong', '', 'Paid out: ' + money(grand)));
+    var head = 'Paid out: ' + money(grand.paid);
+    if (grand.deferred) head += '   ·   Deferred: ' + money(grand.deferred);
+    if (grand.iou) head += '   ·   IOU: ' + money(grand.iou);
+    sum.appendChild(el('strong', '', head));
     var byLine = Object.keys(totals).map(function (k) { return k + ' ' + money(totals[k]); }).join('  ·  ');
-    sum.appendChild(el('div', 'msg-meta', byLine));
+    sum.appendChild(el('div', 'msg-meta', 'Paid per creator — ' + byLine));
     listEl.appendChild(sum);
 
     payments.forEach(function (p) {
       var card = el('div', 'item');
       var head = el('div', 'item-head');
-      head.appendChild(el('strong', 'grow', p.creator + ' — ' + money(p.amount) + (p.note ? '  (' + p.note + ')' : '')));
+      head.appendChild(el('strong', 'grow', p.creator + ' — ' + PAY_KIND_LABEL[payKind(p)] + ' ' + money(p.amount) + (p.note ? '  (' + p.note + ')' : '')));
       head.appendChild(el('span', 'msg-meta', (p.created_at || '').slice(0, 16)));
       var delB = el('button', 'icon-btn danger', '🗑');
       delB.title = 'Delete';
       delB.onclick = function () {
-        if (!confirm('Delete this payment record?')) return;
+        if (!confirm('Delete this ' + PAY_KIND_LABEL[payKind(p)] + ' record?')) return;
         api('/api/admin/payments/' + p.id, { method: 'DELETE' }).then(function () { payments = null; loadPayments(); })
           .catch(function (e) { toast(e.message, true); });
       };
