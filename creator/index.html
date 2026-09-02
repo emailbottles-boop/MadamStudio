@@ -13,7 +13,7 @@
     --bg:#4a1020; --panel:#611829; --panel-2:#742138; --border:#8d3a4e; --border-soft:#6e2739;
     --text:#f7ecd9; --text-2:#e7cfa4; --muted:#cf9bad;
     --accent:#f3c53f; --accent-deep:#d99a1f; --accent-ink:#3a1020;
-    --verified:#6fe0a0; --paid:#f3c53f;
+    --verified:#6fe0a0; --paid:#f3c53f; --payoff:#79b8e8;
     --disp:'Fraunces',Georgia,serif; --body:'Source Serif 4',Georgia,serif;
   }
 
@@ -74,6 +74,26 @@
   .who .eyebrow { font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin: 0 0 6px; }
   .who h1 { font-family: var(--disp); font-weight: 700; font-size: clamp(30px, 5vw, 46px); margin: 0; line-height: 1; letter-spacing: -.01em; color: var(--text); }
   .who .roles { color: var(--text-2); font-size: 13px; margin-top: 8px; white-space: pre-line; line-height: 1.5; }
+
+  /* A display rule on a class outranks the hidden attribute, so panels
+     like #payWrap would render despite it. Same guard as account/. */
+  [hidden] { display: none !important; }
+  .admin-pay { max-width: 900px; margin: 0 auto 26px; padding: 18px 20px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
+  .ap-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+  .ap-field { display: flex; flex-direction: column; gap: 5px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .ap-field.ap-grow { flex: 1; min-width: 180px; }
+  .ap-field input, .ap-field select { font: inherit; font-size: 13px; letter-spacing: normal; text-transform: none; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
+  .ap-row { display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 9px 12px; margin-top: 8px; border: 1px solid var(--border); border-radius: 8px; }
+  .ap-row > div { flex: 1; }
+  .ap-tag { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .ap-tag.ap-deferred { color: var(--accent); border-color: var(--accent); }
+  .ap-tag.ap-iou { color: #ff9db0; border-color: #ff9db0; }
+  /* Clearing deferred pay is the rare, deliberate one — give it its own colour
+     so it stands out from ordinary payments in the ledger. */
+  .ap-tag.ap-payoff { color: var(--payoff); border-color: var(--payoff); }
+  .ap-del { font: inherit; cursor: pointer; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 3px 9px; }
+  .ap-del:hover { color: #b3323c; border-color: #b3323c; }
+  .ap-del:disabled { opacity: .5; cursor: wait; }
 
   .pay { display: flex; gap: 30px; justify-content: center; }
   .pay .stat { text-align: center; }
@@ -204,6 +224,14 @@
           <div class="lbl">Paid to date</div>
           <div class="num" id="payTotal">$0</div>
         </div>
+        <div class="stat">
+          <div class="lbl">Deferred pay</div>
+          <div class="num" id="deferTotal">$0</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">IOU</div>
+          <div class="num" id="iouTotal">$0</div>
+        </div>
       </div>
       <span class="badge" id="whoBadge" style="display:none">✓ Verified crew</span>
     </div>
@@ -213,6 +241,40 @@
     This is the Madam Studio crew work portal. If you work here, claim your card on your account to request access — a producer verifies it, then the work opens.
     <div style="margin-top:14px"><a class="btn primary" href="/account/">Claim your card</a></div>
   </div>
+
+  <!-- Producer tools. Stays hidden unless the API confirms an admin session,
+       and every write below is auth-gated server-side either way. -->
+  <section class="admin-pay" id="adminPay" hidden aria-label="Producer tools">
+    <div class="colhead">
+      <span class="lab">Producer tools</span>
+      <span class="meta" id="adminPayWho"></span>
+    </div>
+    <div class="ap-form">
+      <label class="ap-field">
+        <span>Kind</span>
+        <select id="apKind">
+          <option value="paid">Paid</option>
+          <option value="deferred">Deferred pay</option>
+          <option value="iou">IOU</option>
+        </select>
+      </label>
+      <label class="ap-field" id="apSettlesWrap" hidden>
+        <span>Settles</span>
+        <select id="apSettles"></select>
+      </label>
+      <label class="ap-field">
+        <span>Amount ($)</span>
+        <input id="apAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00">
+      </label>
+      <label class="ap-field ap-grow">
+        <span>Note</span>
+        <input id="apNote" type="text" maxlength="500" placeholder="What it's for">
+      </label>
+      <button class="btn" id="apSave" type="button">Record</button>
+    </div>
+    <p class="up-msg" id="apMsg"></p>
+    <div id="apList"></div>
+  </section>
 
   <div class="split" id="workArea">
     <!-- LEFT HALF: your own work — what the admins assigned to you, plus what you upload -->
@@ -409,6 +471,219 @@ uploadFile.addEventListener("change", async () => {
   }
 });
 
+/* ---- producer tools --------------------------------------------------
+   Three figures hang off one ledger: money already paid, pay that is
+   deferred, and IOUs. An admin records them straight from the creator's
+   page instead of going through the Control Room.
+
+   The Control Room keeps its password in sessionStorage on this same
+   origin, so an admin who signed in there is still signed in here. The
+   panel only appears once the API confirms that session, and every write
+   is auth-gated server-side regardless of what this page chooses to show. */
+const KIND_LABEL = { paid: "Paid", deferred: "Deferred", iou: "IOU" };
+
+function adminPw() { try { return sessionStorage.getItem("madampw") || ""; } catch (_) { return ""; } }
+function adminHeaders() { const pw = adminPw(); return pw ? { "Authorization": "Bearer " + pw } : {}; }
+
+function kindOf(row) { return KIND_LABEL[row.kind] ? row.kind : "paid"; }
+function setStat(id, amount) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = "$" + Math.round(amount).toLocaleString("en-US");
+}
+/**
+ * Mirrors the worker's payTotals. Paid is gross — every dollar sent, whatever
+ * it settled. The two promises are balances: what was recorded, less the
+ * payments marked as settling them, floored at zero so overpaying a debt reads
+ * as settled rather than as owing a negative.
+ */
+function payTotals(rows) {
+  let paid = 0, deferred = 0, iou = 0;
+  rows.forEach(r => {
+    const amount = Number(r.amount) || 0;
+    const kind = kindOf(r);
+    if (kind === "deferred") deferred += amount;
+    else if (kind === "iou") iou += amount;
+    else {
+      paid += amount;
+      if (r.settles === "iou") iou -= amount;
+      else if (r.settles === "deferred") deferred -= amount;
+    }
+  });
+  return { paid, deferred: Math.max(0, deferred), iou: Math.max(0, iou) };
+}
+/**
+ * How a ledger row is badged. A payment that clears a debt is labelled by the
+ * debt it cleared rather than a bare "Paid", so the two read apart at a glance.
+ */
+function rowBadge(row) {
+  const kind = kindOf(row);
+  if (kind === "paid" && row.settles === "deferred") {
+    return { cls: "ap-payoff", label: "Deferred payoff" };
+  }
+  if (kind === "paid" && row.settles === "iou") {
+    return { cls: "ap-paid", label: "IOU payoff" };
+  }
+  return { cls: "ap-" + kind, label: KIND_LABEL[kind] };
+}
+/** Fills the three tiles from a creator's ledger rows and reveals them. */
+function showTotals(rows) {
+  const sums = payTotals(rows);
+  setStat("payTotal", sums.paid);
+  setStat("deferTotal", sums.deferred);
+  setStat("iouTotal", sums.iou);
+  const pw = document.getElementById("payWrap");
+  if (pw) pw.hidden = false;
+  return sums;
+}
+
+async function initAdminPay() {
+  if (!adminPw()) return;
+  try {
+    const res = await fetch(API + "/api/admin/login", { method: "POST", headers: adminHeaders() });
+    if (!res.ok) return;            // not an admin: leave the page exactly as it was
+  } catch (_) { return; }           // backend down: no panel, and no error aimed at a creator
+
+  const wrap = document.getElementById("adminPay");
+  const kindEl = document.getElementById("apKind");
+  const settlesEl = document.getElementById("apSettles");
+  const settlesWrap = document.getElementById("apSettlesWrap");
+  const amtEl = document.getElementById("apAmount");
+  const noteEl = document.getElementById("apNote");
+  const saveEl = document.getElementById("apSave");
+  const msgEl = document.getElementById("apMsg");
+  const listEl = document.getElementById("apList");
+  document.getElementById("adminPayWho").textContent = NAME;
+  wrap.hidden = false;
+
+  function say(text, ok) {
+    msgEl.textContent = text;
+    msgEl.className = "up-msg " + (ok ? "ok" : "err");
+  }
+  function noteRow(text) {
+    const d = document.createElement("div");
+    d.className = "empty-note";
+    d.style.textAlign = "left";
+    d.style.marginTop = "10px";
+    d.textContent = text;
+    return d;
+  }
+
+  function entryRow(row) {
+    const line = document.createElement("div");
+    line.className = "ap-row";
+    const body = document.createElement("div");
+    const badge = rowBadge(row);
+    const tag = document.createElement("span");
+    tag.className = "ap-tag " + badge.cls;
+    tag.textContent = badge.label;
+    const text = document.createElement("span");
+    text.textContent =
+      " $" + (Number(row.amount) || 0).toFixed(2) +
+      (row.note ? " — " + row.note : "") +
+      "  ·  " + (row.created_at || "").slice(0, 10);
+    body.appendChild(tag);
+    body.appendChild(text);
+    const del = document.createElement("button");
+    del.className = "ap-del";
+    del.type = "button";
+    del.title = "Remove this entry";
+    del.textContent = "✕";
+    del.addEventListener("click", async () => {
+      const label = KIND_LABEL[kindOf(row)].toLowerCase();
+      if (!confirm("Remove this " + label + " entry of $" + (Number(row.amount) || 0).toFixed(2) + "?")) return;
+      del.disabled = true;
+      try {
+        const res = await fetch(API + "/api/admin/payments/" + row.id, { method: "DELETE", headers: adminHeaders() });
+        if (!res.ok) throw new Error("delete failed");
+        say("Entry removed.", true);
+        await refresh();
+      } catch (_) {
+        del.disabled = false;
+        say("Couldn't remove that entry.", false);
+      }
+    });
+    line.appendChild(body);
+    line.appendChild(del);
+    return line;
+  }
+
+  /**
+   * Offers only debts that actually exist, and defaults to drawing one down —
+   * paying someone usually settles what they were owed. "Nothing" is always
+   * available for fresh money.
+   */
+  function syncSettles(sums) {
+    const settling = kindEl.value === "paid";
+    settlesWrap.hidden = !settling;
+    if (!settling) return;
+    settlesEl.textContent = "";
+    const opt = (value, label) => {
+      const o = document.createElement("option");
+      o.value = value;
+      o.textContent = label;
+      settlesEl.appendChild(o);
+    };
+    if (sums.iou > 0) opt("iou", "IOU — $" + sums.iou.toFixed(2) + " outstanding");
+    opt("", "Nothing — fresh money");
+    // Deferred pay is money set aside for further down the road, so it is not
+    // what a payment normally comes out of. Offered last, never the default.
+    if (sums.deferred > 0) opt("deferred", "Deferred — $" + sums.deferred.toFixed(2) + " outstanding");
+    settlesEl.value = sums.iou > 0 ? "iou" : "";
+  }
+
+  let outstanding = { paid: 0, deferred: 0, iou: 0 };
+  kindEl.addEventListener("change", () => syncSettles(outstanding));
+
+  async function refresh() {
+    let rows = [];
+    try {
+      const res = await fetch(API + "/api/admin/payments", { headers: adminHeaders() });
+      if (!res.ok) throw new Error("load failed");
+      rows = ((await res.json()).payments || []).filter(r => r.creator === NAME);
+    } catch (_) {
+      listEl.textContent = "";
+      listEl.appendChild(noteRow("Couldn't load this creator's entries."));
+      return;
+    }
+    outstanding = showTotals(rows);
+    syncSettles(outstanding);
+    listEl.textContent = "";
+    if (!rows.length) { listEl.appendChild(noteRow("Nothing recorded for " + NAME + " yet.")); return; }
+    rows.forEach(r => listEl.appendChild(entryRow(r)));
+  }
+
+  saveEl.addEventListener("click", async () => {
+    const amount = Number(amtEl.value);
+    if (!(amount > 0)) { say("Enter an amount above zero.", false); return; }
+    saveEl.disabled = true;
+    try {
+      const res = await fetch(API + "/api/admin/payments", {
+        method: "POST",
+        headers: Object.assign({ "Content-Type": "application/json" }, adminHeaders()),
+        body: JSON.stringify({
+          creator: NAME,
+          amount: amount,
+          note: noteEl.value,
+          kind: kindEl.value,
+          settles: kindEl.value === "paid" ? settlesEl.value : "",
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { say(data.error || "Couldn't save that.", false); return; }
+      amtEl.value = "";
+      noteEl.value = "";
+      say(KIND_LABEL[kindEl.value] + " entry recorded.", true);
+      await refresh();
+    } catch (_) {
+      say("Couldn't reach the backend.", false);
+    } finally {
+      saveEl.disabled = false;
+    }
+  });
+
+  await refresh();
+}
+
 (async () => {
   if (!NAME) { location.replace("/crew/"); return; }
 
@@ -417,6 +692,10 @@ uploadFile.addEventListener("change", async () => {
   whoPhoto.textContent = initials(NAME);
   const gh = document.getElementById("nameGhost");
   if (gh) gh.textContent = (NAME.split(/\s+/).pop() || NAME).toUpperCase();
+
+  // Runs on its own: an admin is not necessarily crew, so this must not sit
+  // behind the member checks below, which return early for anyone who isn't.
+  initAdminPay();
 
   // Public header only: name / role / photo / verified badge. These come from
   // the public credits + claims-public — the WORK below is gated.
@@ -473,21 +752,21 @@ uploadFile.addEventListener("change", async () => {
   let canUpload = (me.creators || []).includes(NAME);
   {
     {
-      // Payments to this creator, visible only to the signed-in owner of the card.
+      // The ledger for this creator, visible only to the signed-in owner of the
+      // card. Deferred pay and IOUs are promises, so they get their own tiles
+      // rather than inflating what has actually been paid.
       if (canUpload) {
         const mine = (me.payments || []).filter(p => p.creator === NAME);
         if (mine.length) {
-          const total = mine.reduce((s, p) => s + (Number(p.amount) || 0), 0);
-          const pt = document.getElementById("payTotal");
-          if (pt) pt.textContent = "$" + Math.round(total).toLocaleString("en-US");
-          const pw = document.getElementById("payWrap");
-          if (pw) pw.hidden = false;
+          const sums = showTotals(mine);
           const list = document.getElementById("paidList");
           list.innerHTML = "";
           const tot = document.createElement("div");
           tot.className = "up-title";
           tot.style.margin = "0 0 8px";
-          tot.textContent = "Total: $" + total.toFixed(2);
+          tot.textContent = "Paid: $" + sums.paid.toFixed(2) +
+            (sums.deferred ? "  ·  Deferred: $" + sums.deferred.toFixed(2) : "") +
+            (sums.iou ? "  ·  IOU: $" + sums.iou.toFixed(2) : "");
           list.appendChild(tot);
           mine.forEach(p => {
             const row = document.createElement("div");
@@ -495,7 +774,7 @@ uploadFile.addEventListener("change", async () => {
             row.style.textAlign = "left";
             row.style.padding = "10px 12px";
             row.style.marginBottom = "8px";
-            row.textContent = "$" + (Number(p.amount) || 0).toFixed(2) + (p.note ? " — " + p.note : "") + "  ·  " + (p.created_at || "").slice(0, 10);
+            row.textContent = rowBadge(p).label + "  ·  $" + (Number(p.amount) || 0).toFixed(2) + (p.note ? " — " + p.note : "") + "  ·  " + (p.created_at || "").slice(0, 10);
             list.appendChild(row);
           });
           document.getElementById("paidWrap").hidden = false;
