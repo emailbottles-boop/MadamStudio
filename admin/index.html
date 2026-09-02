@@ -1361,6 +1361,28 @@
   // A row written before kinds existed has no kind and is a real payment.
   var PAY_KIND_LABEL = { paid: 'paid', deferred: 'deferred', iou: 'IOU' };
   function payKind(p) { return PAY_KIND_LABEL[p.kind] ? p.kind : 'paid'; }
+  function paySettleNote(p) {
+    if (p.settles === 'iou') return ' · settles IOU';
+    if (p.settles === 'deferred') return ' · settles deferred';
+    return '';
+  }
+  // Same fold as the worker: paid is gross, the promises are balances.
+  function payFold(rows) {
+    var t = { paid: 0, deferred: 0, iou: 0 };
+    rows.forEach(function (p) {
+      var a = Number(p.amount) || 0, k = payKind(p);
+      if (k === 'deferred') t.deferred += a;
+      else if (k === 'iou') t.iou += a;
+      else {
+        t.paid += a;
+        if (p.settles === 'iou') t.iou -= a;
+        else if (p.settles === 'deferred') t.deferred -= a;
+      }
+    });
+    t.deferred = Math.max(0, t.deferred);
+    t.iou = Math.max(0, t.iou);
+    return t;
+  }
 
   function renderPayments() {
     if (payments === null) {
@@ -1386,6 +1408,18 @@
     kind.appendChild(new Option('IOU', 'iou'));
     kindWrap.appendChild(kind);
     fields.appendChild(kindWrap);
+    var settlesWrap = el('div');
+    settlesWrap.appendChild(el('label', '', 'Settles'));
+    var settles = el('select');
+    settles.appendChild(new Option('Nothing — fresh money', ''));
+    settles.appendChild(new Option('IOU', 'iou'));
+    settles.appendChild(new Option('Deferred', 'deferred'));
+    settlesWrap.appendChild(settles);
+    fields.appendChild(settlesWrap);
+    // Only money actually sent can settle a promise.
+    function syncSettles() { settlesWrap.style.display = kind.value === 'paid' ? '' : 'none'; }
+    kind.onchange = syncSettles;
+    syncSettles();
     var amtWrap = el('div');
     amtWrap.appendChild(el('label', '', 'Amount ($)'));
     var amt = el('input'); amt.type = 'number'; amt.min = '0'; amt.step = '0.01';
@@ -1404,7 +1438,13 @@
       api('/api/admin/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ creator: sel.value, amount: Number(amt.value), note: note.value, kind: kind.value }),
+        body: JSON.stringify({
+          creator: sel.value,
+          amount: Number(amt.value),
+          note: note.value,
+          kind: kind.value,
+          settles: kind.value === 'paid' ? settles.value : '',
+        }),
       }).then(function () { toast('Entry recorded'); payments = null; loadPayments(); })
         .catch(function (e) { toast(e.message, true); payBtn.disabled = false; });
     };
@@ -1416,28 +1456,33 @@
       listEl.appendChild(el('div', 'empty', 'Nothing recorded yet.'));
       return;
     }
-    // Per-creator totals. Only real payments count as paid out — deferred pay
-    // and IOUs are money still owed, so they are totalled separately.
-    var totals = {};
-    var grand = { paid: 0, deferred: 0, iou: 0 };
+    // Paid out is gross. Deferred and IOU are what is still owed once the
+    // payments that settled them are taken off.
+    var byCreator = {};
     payments.forEach(function (p) {
-      var k = payKind(p);
-      totals[p.creator] = (totals[p.creator] || 0) + (k === 'paid' ? (Number(p.amount) || 0) : 0);
-      grand[k] += Number(p.amount) || 0;
+      (byCreator[p.creator] = byCreator[p.creator] || []).push(p);
     });
+    var grand = payFold(payments);
     var sum = el('div', 'item');
     var head = 'Paid out: ' + money(grand.paid);
-    if (grand.deferred) head += '   ·   Deferred: ' + money(grand.deferred);
-    if (grand.iou) head += '   ·   IOU: ' + money(grand.iou);
+    if (grand.deferred) head += '   ·   Deferred owed: ' + money(grand.deferred);
+    if (grand.iou) head += '   ·   IOU owed: ' + money(grand.iou);
     sum.appendChild(el('strong', '', head));
-    var byLine = Object.keys(totals).map(function (k) { return k + ' ' + money(totals[k]); }).join('  ·  ');
+    var byLine = Object.keys(byCreator).map(function (name) {
+      var t = payFold(byCreator[name]);
+      var line = name + ' ' + money(t.paid);
+      if (t.deferred || t.iou) {
+        line += ' (owed ' + money(t.deferred + t.iou) + ')';
+      }
+      return line;
+    }).join('  ·  ');
     sum.appendChild(el('div', 'msg-meta', 'Paid per creator — ' + byLine));
     listEl.appendChild(sum);
 
     payments.forEach(function (p) {
       var card = el('div', 'item');
       var head = el('div', 'item-head');
-      head.appendChild(el('strong', 'grow', p.creator + ' — ' + PAY_KIND_LABEL[payKind(p)] + ' ' + money(p.amount) + (p.note ? '  (' + p.note + ')' : '')));
+      head.appendChild(el('strong', 'grow', p.creator + ' — ' + PAY_KIND_LABEL[payKind(p)] + ' ' + money(p.amount) + (p.note ? '  (' + p.note + ')' : '') + paySettleNote(p)));
       head.appendChild(el('span', 'msg-meta', (p.created_at || '').slice(0, 16)));
       var delB = el('button', 'icon-btn danger', '🗑');
       delB.title = 'Delete';
