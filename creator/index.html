@@ -13,7 +13,7 @@
     --bg:#4a1020; --panel:#611829; --panel-2:#742138; --border:#8d3a4e; --border-soft:#6e2739;
     --text:#f7ecd9; --text-2:#e7cfa4; --muted:#cf9bad;
     --accent:#f3c53f; --accent-deep:#d99a1f; --accent-ink:#3a1020;
-    --verified:#6fe0a0; --paid:#f3c53f;
+    --verified:#6fe0a0; --paid:#f3c53f; --payoff:#79b8e8;
     --disp:'Fraunces',Georgia,serif; --body:'Source Serif 4',Georgia,serif;
   }
 
@@ -86,8 +86,11 @@
   .ap-row { display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 9px 12px; margin-top: 8px; border: 1px solid var(--border); border-radius: 8px; }
   .ap-row > div { flex: 1; }
   .ap-tag { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
-  .ap-tag.ap-deferred { color: #b8860b; border-color: #b8860b; }
-  .ap-tag.ap-iou { color: #b3323c; border-color: #b3323c; }
+  .ap-tag.ap-deferred { color: var(--accent); border-color: var(--accent); }
+  .ap-tag.ap-iou { color: #ff9db0; border-color: #ff9db0; }
+  /* Clearing deferred pay is the rare, deliberate one — give it its own colour
+     so it stands out from ordinary payments in the ledger. */
+  .ap-tag.ap-payoff { color: var(--payoff); border-color: var(--payoff); }
   .ap-del { font: inherit; cursor: pointer; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 3px 9px; }
   .ap-del:hover { color: #b3323c; border-color: #b3323c; }
   .ap-del:disabled { opacity: .5; cursor: wait; }
@@ -508,11 +511,19 @@ function payTotals(rows) {
   });
   return { paid, deferred: Math.max(0, deferred), iou: Math.max(0, iou) };
 }
-/** What a row settled, for the ledger line. */
-function settleNote(row) {
-  if (row.settles === "iou") return "  ·  settles IOU";
-  if (row.settles === "deferred") return "  ·  settles deferred";
-  return "";
+/**
+ * How a ledger row is badged. A payment that clears a debt is labelled by the
+ * debt it cleared rather than a bare "Paid", so the two read apart at a glance.
+ */
+function rowBadge(row) {
+  const kind = kindOf(row);
+  if (kind === "paid" && row.settles === "deferred") {
+    return { cls: "ap-payoff", label: "Deferred payoff" };
+  }
+  if (kind === "paid" && row.settles === "iou") {
+    return { cls: "ap-paid", label: "IOU payoff" };
+  }
+  return { cls: "ap-" + kind, label: KIND_LABEL[kind] };
 }
 /** Fills the three tiles from a creator's ledger rows and reveals them. */
 function showTotals(rows) {
@@ -561,14 +572,14 @@ async function initAdminPay() {
     const line = document.createElement("div");
     line.className = "ap-row";
     const body = document.createElement("div");
+    const badge = rowBadge(row);
     const tag = document.createElement("span");
-    tag.className = "ap-tag ap-" + kindOf(row);
-    tag.textContent = KIND_LABEL[kindOf(row)];
+    tag.className = "ap-tag " + badge.cls;
+    tag.textContent = badge.label;
     const text = document.createElement("span");
     text.textContent =
       " $" + (Number(row.amount) || 0).toFixed(2) +
       (row.note ? " — " + row.note : "") +
-      settleNote(row) +
       "  ·  " + (row.created_at || "").slice(0, 10);
     body.appendChild(tag);
     body.appendChild(text);
@@ -613,9 +624,11 @@ async function initAdminPay() {
       settlesEl.appendChild(o);
     };
     if (sums.iou > 0) opt("iou", "IOU — $" + sums.iou.toFixed(2) + " outstanding");
-    if (sums.deferred > 0) opt("deferred", "Deferred — $" + sums.deferred.toFixed(2) + " outstanding");
     opt("", "Nothing — fresh money");
-    settlesEl.value = settlesEl.options[0].value;
+    // Deferred pay is money set aside for further down the road, so it is not
+    // what a payment normally comes out of. Offered last, never the default.
+    if (sums.deferred > 0) opt("deferred", "Deferred — $" + sums.deferred.toFixed(2) + " outstanding");
+    settlesEl.value = sums.iou > 0 ? "iou" : "";
   }
 
   let outstanding = { paid: 0, deferred: 0, iou: 0 };
@@ -761,7 +774,7 @@ async function initAdminPay() {
             row.style.textAlign = "left";
             row.style.padding = "10px 12px";
             row.style.marginBottom = "8px";
-            row.textContent = KIND_LABEL[kindOf(p)] + "  ·  $" + (Number(p.amount) || 0).toFixed(2) + (p.note ? " — " + p.note : "") + settleNote(p) + "  ·  " + (p.created_at || "").slice(0, 10);
+            row.textContent = rowBadge(p).label + "  ·  $" + (Number(p.amount) || 0).toFixed(2) + (p.note ? " — " + p.note : "") + "  ·  " + (p.created_at || "").slice(0, 10);
             list.appendChild(row);
           });
           document.getElementById("paidWrap").hidden = false;
